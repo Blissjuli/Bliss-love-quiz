@@ -1,5 +1,6 @@
 let currentScreen = 'welcome';
 let userGender = '';
+let userName = '';
 let quizIndex = 0;
 let userAnswers = [];
 let finalAnswer = '';
@@ -89,6 +90,20 @@ function selectGender(gender) {
   userAnswers = [];
   quizIndex = 0;
   startMusic();
+  goToScreen('name');
+  setTimeout(function() {
+    document.getElementById('nameInput').focus();
+  }, 500);
+}
+
+function submitName() {
+  var name = document.getElementById('nameInput').value.trim();
+  if (!name) {
+    document.getElementById('nameInput').style.borderColor = '#ff4d7a';
+    document.getElementById('nameInput').placeholder = 'Please enter your name...';
+    return;
+  }
+  userName = name;
   goToScreen('quiz');
   setTimeout(showQuestion, 400);
 }
@@ -147,12 +162,14 @@ function submitQuizData() {
   ).join('\n\n');
 
   db.collection('quiz_responses').add({
+    name: userName,
     gender: userGender,
     answers: userAnswers,
     final_answer: finalAnswer,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
     emailjs.send('service_9d8acod', 'template_rgdgacp', {
+      name: userName,
       gender: userGender,
       final_answer: finalAnswer,
       answers: qaList
@@ -164,6 +181,7 @@ function restartApp() {
   stopConfetti();
   stopMusic();
   userGender = '';
+  userName = '';
   quizIndex = 0;
   userAnswers = [];
   goToScreen('welcome');
@@ -280,17 +298,17 @@ function createFloatingHearts() {
 
 /* ---- Music Player ---- */
 var playlist = [
-  { title: "Perfect", path: "audio/Ed Sheeran - Perfect [Official Audio] - ilovethatsongtoo.mp3" },
-  { title: "Say You Won't Let Go", path: "audio/361.James Arthur - Say You Won't Let Go.mp3" },
-  { title: "Lucid Dreams", path: "audio/Juice-WRLD-Lucid-Dreams-(HipHopKit.com).mp3" },
-  { title: "Someone You Loved", path: "audio/Lewis Capaldi - Someone You Loved.mp3" },
-  { title: "MOONLIGHT", path: "audio/xxxtentacion - MOONLIGHT.mp3" },
-  { title: "Another Love", path: "audio/Another Love - Tom Odell.mp3" },
-  { title: "A Thousand Years", path: "audio/A Thousand Years - Christina Perri - reduzida.mp3" },
-  { title: "Dandelions", path: "audio/Ruth B. - Dandelions (Lyrics).mp3" },
-  { title: "Lovely", path: "audio/Billie Ellish, Khaild- Lovely.mp3" },
-  { title: "Older", path: "audio/Older- Sasha Sloan.mp3" },
-  { title: "you broke me first", path: "audio/Tate McRae - you broke me first (JUST JAMES Remix).mp3" }
+  { title: "Perfect", icon: "\uD83C\uDFB6", path: "audio/Ed Sheeran - Perfect [Official Audio] - ilovethatsongtoo.mp3" },
+  { title: "Say You Won't Let Go", icon: "\uD83E\uDD0D", path: "audio/361.James Arthur - Say You Won't Let Go.mp3" },
+  { title: "Lucid Dreams", icon: "\uD83C\uDF19", path: "audio/Juice-WRLD-Lucid-Dreams-(HipHopKit.com).mp3" },
+  { title: "Someone You Loved", icon: "\uD83D\uDC94", path: "audio/Lewis Capaldi - Someone You Loved.mp3" },
+  { title: "MOONLIGHT", icon: "\uD83C\uDF19", path: "audio/xxxtentacion - MOONLIGHT.mp3" },
+  { title: "Another Love", icon: "\uD83D\uDC9C", path: "audio/Another Love - Tom Odell.mp3" },
+  { title: "A Thousand Years", icon: "\u23F3", path: "audio/A Thousand Years - Christina Perri - reduzida.mp3" },
+  { title: "Dandelions", icon: "\uD83C\uDF3C", path: "audio/Ruth B. - Dandelions (Lyrics).mp3" },
+  { title: "Lovely", icon: "\uD83D\uDC9C", path: "audio/Billie Ellish, Khaild- Lovely.mp3" },
+  { title: "Older", icon: "\uD83D\uDC75", path: "audio/Older- Sasha Sloan.mp3" },
+  { title: "you broke me first", icon: "\uD83D\uDC94", path: "audio/Tate McRae - you broke me first (JUST JAMES Remix).mp3" }
 ];
 
 var audioEls = [new Audio(), new Audio()];
@@ -308,9 +326,12 @@ function shuffle(arr) {
   return arr;
 }
 
-function setSongStatus(text) {
+function setSongStatus(text, icon) {
   var el = document.getElementById('music-status');
-  if (el) { el.textContent = '\u266B ' + text; el.style.opacity = '1'; }
+  if (el) {
+    el.innerHTML = '<span class="status-icon emoji-icon">' + (icon || '\u266B') + '</span><span class="status-label">' + text + '</span>';
+    el.style.opacity = '1';
+  }
 }
 
 function startMusic() {
@@ -328,11 +349,14 @@ function playCurrent() {
   el.src = track.path;
   el.volume = 1;
   el.play().catch(function(){});
-  setSongStatus(track.title);
-  watchForFade(el);
+  setSongStatus(track.title, track.icon);
   el.addEventListener('ended', function onEnd() {
     el.removeEventListener('ended', onEnd);
-    if (!crossfading) doCrossfade(el);
+    if (trackIdx >= shuffledTracks.length - 1) {
+      location.reload();
+    } else {
+      if (!crossfading) doCrossfade(el);
+    }
   });
   shuffleNext();
 }
@@ -365,7 +389,8 @@ function doCrossfade(oldEl) {
   var newEl = audioEls[1 - activeIdx];
   newEl.volume = 0;
   newEl.play().catch(function(){});
-  setSongStatus(shuffledTracks[trackIdx].title);
+  var track = shuffledTracks[trackIdx];
+  setSongStatus(track.title, track.icon);
 
   var start = Date.now();
   var dur = 2000;
