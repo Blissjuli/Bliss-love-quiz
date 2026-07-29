@@ -447,22 +447,28 @@ function stopMusic() {
 
 /* ---- Admin Panel ---- */
 
-const ADMIN_USER = 'blissjuli';
-const ADMIN_PASS = 'blissjuli2';
-
 var adminLoggedIn = false;
 
 function adminLogin() {
-  var user = document.getElementById('adminUser').value.trim();
-  var pass = document.getElementById('adminPass').value;
-  if (user === ADMIN_USER && pass === ADMIN_PASS) {
-    adminLoggedIn = true;
-    document.getElementById('adminLoginError').textContent = '';
-    goToScreen('admin');
-    refreshAdminData();
-  } else {
-    document.getElementById('adminLoginError').textContent = 'Invalid username or password';
-  }
+  var email = document.getElementById('adminUser').value.trim();
+  var password = document.getElementById('adminPass').value;
+
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(async function(result) {
+      var token = await result.user.getIdTokenResult();
+      if (token.claims.admin) {
+        adminLoggedIn = true;
+        document.getElementById('adminLoginError').textContent = '';
+        goToScreen('admin');
+        refreshAdminData();
+      } else {
+        document.getElementById('adminLoginError').textContent = 'This account is not an admin.';
+        firebase.auth().signOut();
+      }
+    })
+    .catch(function(err) {
+      document.getElementById('adminLoginError').textContent = err.message;
+    });
 }
 
 function adminLogout() {
@@ -470,6 +476,7 @@ function adminLogout() {
   document.getElementById('adminUser').value = '';
   document.getElementById('adminPass').value = '';
   document.getElementById('adminLoginError').textContent = '';
+  firebase.auth().signOut();
   goToScreen('welcome');
 }
 
