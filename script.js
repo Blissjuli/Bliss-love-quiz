@@ -498,23 +498,31 @@ function refreshAdminData() {
 
         var card = document.createElement('div');
         card.className = 'admin-card';
-        card.innerHTML =
-          '<div class="admin-card-header" onclick="this.parentNode.classList.toggle(\'open\')">' +
-            '<div>' +
-              '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + ' ' + finalEmoji + '</span></div>' +
-              '<div class="admin-card-meta"><span>' + dateStr + '</span><span>' + id.slice(0,8) + '</span></div>' +
-            '</div>' +
-            '<span class="admin-card-toggle">\u25BC</span>' +
+        var header = document.createElement('div');
+        header.className = 'admin-card-header';
+        header.onclick = function() { this.parentNode.classList.toggle('open'); };
+        header.innerHTML =
+          '<div>' +
+            '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + ' ' + finalEmoji + '</span></div>' +
+            '<div class="admin-card-meta"><span>' + dateStr + '</span><span>' + id.slice(0,8) + '</span></div>' +
           '</div>' +
-          '<div class="admin-card-details">' +
-            d.answers.map(function(ans, i) {
-              var qText = qs[i] ? qs[i].q : 'Q' + (i+1);
-              return '<div class="admin-qa"><strong>' + escHtml(qText) + '</strong><br>A: ' + escHtml(ans) + '</div>';
-            }).join('') +
-            '<div class="admin-card-actions">' +
-              '<button class="glow-btn delete-btn" onclick="event.stopPropagation();deleteResponse(\'' + id + '\')">Delete</button>' +
-            '</div>' +
-          '</div>';
+          '<span class="admin-card-toggle">\u25BC</span>';
+        var details = document.createElement('div');
+        details.className = 'admin-card-details';
+        details.innerHTML = d.answers.map(function(ans, i) {
+          var qText = qs[i] ? qs[i].q : 'Q' + (i+1);
+          return '<div class="admin-qa"><strong>' + escHtml(qText) + '</strong><br>A: ' + escHtml(ans) + '</div>';
+        }).join('');
+        var actions = document.createElement('div');
+        actions.className = 'admin-card-actions';
+        var delBtn = document.createElement('button');
+        delBtn.className = 'glow-btn delete-btn';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = function(e) { e.stopPropagation(); deleteResponse(id); };
+        actions.appendChild(delBtn);
+        details.appendChild(actions);
+        card.appendChild(header);
+        card.appendChild(details);
         list.appendChild(card);
       });
     })
@@ -633,29 +641,28 @@ function saveSong() {
   var editId = document.getElementById('songEditId').value;
   if (!title || !path) return;
 
-  var save = function(order) {
-    var data = { title: title, icon: icon, path: path, order: order };
-    if (editId) {
-      db.collection('playlist').doc(editId).update(data).then(function() {
-        cancelSongForm();
-        loadMusicList();
-      }).catch(console.error);
-    } else {
-      db.collection('playlist').add(data).then(function() {
-        cancelSongForm();
-        loadMusicList();
-      }).catch(console.error);
-    }
-  };
-
   if (editId) {
-    save(0);
+    db.collection('playlist').doc(editId).get().then(function(doc) {
+      var data = { title: title, icon: icon, path: path, order: doc.exists ? doc.data().order : 0 };
+      return db.collection('playlist').doc(editId).update(data);
+    }).then(function() {
+      cancelSongForm();
+      loadMusicList();
+    }).catch(console.error);
   } else {
     db.collection('playlist').orderBy('order', 'desc').limit(1).get().then(function(snap) {
       var maxOrder = 0;
       snap.forEach(function(d) { maxOrder = d.data().order + 1; });
-      save(maxOrder);
-    }).catch(function() { save(0); });
+      return db.collection('playlist').add({ title: title, icon: icon, path: path, order: maxOrder });
+    }).then(function() {
+      cancelSongForm();
+      loadMusicList();
+    }).catch(function() {
+      db.collection('playlist').add({ title: title, icon: icon, path: path, order: 0 }).then(function() {
+        cancelSongForm();
+        loadMusicList();
+      }).catch(console.error);
+    });
   }
 }
 
