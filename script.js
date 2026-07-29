@@ -297,7 +297,9 @@ function createFloatingHearts() {
 
 
 /* ---- Music Player ---- */
-var playlist = [
+var playlist = [];
+
+var defaultPlaylist = [
   { title: "Perfect", icon: "\uD83C\uDFB6", path: "audio/Ed Sheeran - Perfect [Official Audio] - ilovethatsongtoo.mp3" },
   { title: "Say You Won't Let Go", icon: "\uD83E\uDD0D", path: "audio/361.James Arthur - Say You Won't Let Go.mp3" },
   { title: "Lucid Dreams", icon: "\uD83C\uDF19", path: "audio/Juice-WRLD-Lucid-Dreams-(HipHopKit.com).mp3" },
@@ -310,6 +312,25 @@ var playlist = [
   { title: "Older", icon: "\uD83D\uDC75", path: "audio/Older- Sasha Sloan.mp3" },
   { title: "you broke me first", icon: "\uD83D\uDC94", path: "audio/Tate McRae - you broke me first (JUST JAMES Remix).mp3" }
 ];
+
+function loadPlaylist(callback) {
+  db.collection('playlist').orderBy('order').get().then(function(snapshot) {
+    if (snapshot.empty) {
+      playlist = [].concat(defaultPlaylist);
+    } else {
+      playlist = [];
+      snapshot.forEach(function(doc) {
+        var d = doc.data();
+        d.firestoreId = doc.id;
+        playlist.push(d);
+      });
+    }
+    if (callback) callback();
+  }).catch(function() {
+    playlist = [].concat(defaultPlaylist);
+    if (callback) callback();
+  });
+}
 
 var audioEls = [new Audio(), new Audio()];
 var activeIdx = 0;
@@ -424,18 +445,257 @@ function stopMusic() {
   audioEls[1].pause(); audioEls[1].src = '';
 }
 
-/* ---- Override goToScreen for surprise regeneration ---- */
+/* ---- Admin Panel ---- */
+
+const ADMIN_USER = 'blissjuli';
+const ADMIN_PASS = 'blissjuli2';
+
+var adminLoggedIn = false;
+
+function adminLogin() {
+  var user = document.getElementById('adminUser').value.trim();
+  var pass = document.getElementById('adminPass').value;
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    adminLoggedIn = true;
+    document.getElementById('adminLoginError').textContent = '';
+    goToScreen('admin');
+    refreshAdminData();
+  } else {
+    document.getElementById('adminLoginError').textContent = 'Invalid username or password';
+  }
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('adminLoginError').textContent = '';
+  goToScreen('welcome');
+}
+
+function refreshAdminData() {
+  var list = document.getElementById('adminList');
+  list.innerHTML = '<div class="admin-loading">Loading...</div>';
+  db.collection('quiz_responses').orderBy('createdAt', 'desc').get()
+    .then(function(snapshot) {
+      document.getElementById('adminCount').textContent = '(' + snapshot.size + ' total)';
+      if (snapshot.empty) {
+        list.innerHTML = '<div class="admin-empty">No responses yet</div>';
+        return;
+      }
+      list.innerHTML = '';
+      snapshot.forEach(function(doc) {
+        var d = doc.data();
+        var id = doc.id;
+        var dateStr = '';
+        if (d.createdAt) {
+          var date = d.createdAt.toDate();
+          dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
+        var genderEmoji = d.gender === 'male' ? '\u2642' : '\u2640';
+        var finalEmoji = d.final_answer === 'yes' ? '\u2764' : '\uD83D\uDC94';
+        var qs = questions[d.gender] || [];
+
+        var card = document.createElement('div');
+        card.className = 'admin-card';
+        card.innerHTML =
+          '<div class="admin-card-header" onclick="this.parentNode.classList.toggle(\'open\')">' +
+            '<div>' +
+              '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + ' ' + finalEmoji + '</span></div>' +
+              '<div class="admin-card-meta"><span>' + dateStr + '</span><span>' + id.slice(0,8) + '</span></div>' +
+            '</div>' +
+            '<span class="admin-card-toggle">\u25BC</span>' +
+          '</div>' +
+          '<div class="admin-card-details">' +
+            d.answers.map(function(ans, i) {
+              var qText = qs[i] ? qs[i].q : 'Q' + (i+1);
+              return '<div class="admin-qa"><strong>' + escHtml(qText) + '</strong><br>A: ' + escHtml(ans) + '</div>';
+            }).join('') +
+            '<div class="admin-card-actions">' +
+              '<button class="glow-btn delete-btn" onclick="event.stopPropagation();deleteResponse(\'' + id + '\')">Delete</button>' +
+            '</div>' +
+          '</div>';
+        list.appendChild(card);
+      });
+    })
+    .catch(function(err) {
+      list.innerHTML = '<div class="admin-empty">Error loading data</div>';
+      console.error(err);
+    });
+}
+
+function deleteResponse(id) {
+  if (!confirm('Delete this response?')) return;
+  db.collection('quiz_responses').doc(id).delete()
+    .then(function() {
+      refreshAdminData();
+    })
+    .catch(console.error);
+}
+
+function escHtml(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+/* ---- Override goToScreen ---- */
 const origGoToScreen = goToScreen;
 goToScreen = function(id) {
   origGoToScreen(id);
   if (id === 'surprise') {
     generateSurpriseBoxes();
   }
+  if (id === 'admin' && !adminLoggedIn) {
+    origGoToScreen('welcome');
+  }
+  if (id === 'admin-login') {
+    document.getElementById('adminUser').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminLoginError').textContent = '';
+  }
 };
+
+/* ---- Music Manager (Admin) ---- */
+
+function showAdminTab(tab) {
+  document.getElementById('tabResponses').className = 'admin-tab' + (tab === 'responses' ? ' active' : '');
+  document.getElementById('tabMusic').className = 'admin-tab' + (tab === 'music' ? ' active' : '');
+  document.getElementById('adminResponses').style.display = tab === 'responses' ? 'block' : 'none';
+  document.getElementById('adminMusic').style.display = tab === 'music' ? 'block' : 'none';
+  if (tab === 'music') loadMusicList();
+}
+
+function loadMusicList() {
+  var list = document.getElementById('musicList');
+  list.innerHTML = '<div class="admin-loading">Loading...</div>';
+  db.collection('playlist').orderBy('order').get().then(function(snapshot) {
+    if (snapshot.empty) {
+      list.innerHTML = '<div class="admin-empty">No songs. Add one or reset to defaults.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(function(doc) {
+      var d = doc.data();
+      var id = doc.id;
+      var card = document.createElement('div');
+      card.className = 'admin-music-card';
+      var editBtn = document.createElement('button');
+      editBtn.className = 'glow-btn';
+      editBtn.textContent = 'Edit';
+      editBtn.dataset.id = id;
+      editBtn.dataset.title = d.title;
+      editBtn.dataset.icon = d.icon || '\u266B';
+      editBtn.dataset.path = d.path;
+      editBtn.onclick = function() {
+        editSong(this.dataset.id, this.dataset.title, this.dataset.icon, this.dataset.path);
+      };
+      var delBtn = document.createElement('button');
+      delBtn.className = 'glow-btn delete-btn';
+      delBtn.textContent = 'X';
+      delBtn.dataset.id = id;
+      delBtn.onclick = function() { deleteSong(this.dataset.id); };
+
+      card.innerHTML =
+        '<div class="admin-music-info">' +
+          '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
+          '<div>' +
+            '<div class="admin-music-title">' + escHtml(d.title) + '</div>' +
+            '<div class="admin-music-path">' + escHtml(d.path) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="admin-music-actions"></div>';
+      card.querySelector('.admin-music-actions').appendChild(editBtn);
+      card.querySelector('.admin-music-actions').appendChild(delBtn);
+      list.appendChild(card);
+    });
+  }).catch(function() {
+    list.innerHTML = '<div class="admin-empty">Error loading music</div>';
+  });
+}
+
+function showAddSongForm() {
+  document.getElementById('songEditId').value = '';
+  document.getElementById('songTitle').value = '';
+  document.getElementById('songIcon').value = '\u266B';
+  document.getElementById('songPath').value = 'audio/';
+  document.getElementById('addSongForm').style.display = 'block';
+}
+
+function cancelSongForm() {
+  document.getElementById('addSongForm').style.display = 'none';
+}
+
+function saveSong() {
+  var title = document.getElementById('songTitle').value.trim();
+  var icon = document.getElementById('songIcon').value.trim() || '\u266B';
+  var path = document.getElementById('songPath').value.trim();
+  var editId = document.getElementById('songEditId').value;
+  if (!title || !path) return;
+
+  var save = function(order) {
+    var data = { title: title, icon: icon, path: path, order: order };
+    if (editId) {
+      db.collection('playlist').doc(editId).update(data).then(function() {
+        cancelSongForm();
+        loadMusicList();
+      }).catch(console.error);
+    } else {
+      db.collection('playlist').add(data).then(function() {
+        cancelSongForm();
+        loadMusicList();
+      }).catch(console.error);
+    }
+  };
+
+  if (editId) {
+    save(0);
+  } else {
+    db.collection('playlist').orderBy('order', 'desc').limit(1).get().then(function(snap) {
+      var maxOrder = 0;
+      snap.forEach(function(d) { maxOrder = d.data().order + 1; });
+      save(maxOrder);
+    }).catch(function() { save(0); });
+  }
+}
+
+function editSong(id, title, icon, path) {
+  document.getElementById('songEditId').value = id;
+  document.getElementById('songTitle').value = title;
+  document.getElementById('songIcon').value = icon;
+  document.getElementById('songPath').value = path;
+  document.getElementById('addSongForm').style.display = 'block';
+}
+
+function deleteSong(id) {
+  if (!confirm('Delete this song?')) return;
+  db.collection('playlist').doc(id).delete().then(function() {
+    loadMusicList();
+  }).catch(console.error);
+}
+
+function seedPlaylist() {
+  if (!confirm('Replace all songs with defaults?')) return;
+  db.collection('playlist').get().then(function(snapshot) {
+    var batch = db.batch();
+    snapshot.forEach(function(doc) { batch.delete(doc.ref); });
+    defaultPlaylist.forEach(function(song, i) {
+      var ref = db.collection('playlist').doc();
+      batch.set(ref, { title: song.title, icon: song.icon, path: song.path, order: i });
+    });
+    return batch.commit();
+  }).then(function() {
+    loadMusicList();
+  }).catch(console.error);
+}
 
 /* ---- Init ---- */
 window.onload = function() {
   createFloatingHearts();
+  loadPlaylist();
+  if (window.location.search.indexOf('admin') !== -1 || window.location.hash.indexOf('admin') !== -1) {
+    goToScreen('admin-login');
+  }
 };
 
 window.onresize = function() {

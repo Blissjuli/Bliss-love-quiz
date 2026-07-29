@@ -104,6 +104,61 @@
 
 </div>
 
+  <!-- Admin Login -->
+  <div id="screen-admin-login" class="screen">
+    <div class="admin-login-content">
+      <h2 class="slide-in">Admin Login</h2>
+      <div class="admin-login-form">
+        <input type="text" id="adminUser" placeholder="Username" autocomplete="off">
+        <input type="password" id="adminPass" placeholder="Password">
+        <button class="glow-btn" onclick="adminLogin()">Login</button>
+        <p id="adminLoginError"></p>
+        <button class="back-link" onclick="goToScreen('welcome')">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="screen-admin" class="screen">
+    <div class="admin-content">
+      <div class="admin-header">
+        <h2 class="glow-text">Admin Dashboard</h2>
+        <button class="glow-btn small-btn" onclick="adminLogout()">Logout</button>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" id="tabResponses" onclick="showAdminTab('responses')">Responses</button>
+        <button class="admin-tab" id="tabMusic" onclick="showAdminTab('music')">Music</button>
+      </div>
+      <div id="adminResponses">
+        <div class="admin-controls">
+          <button class="glow-btn small-btn" onclick="refreshAdminData()">Refresh</button>
+          <span id="adminCount"></span>
+        </div>
+        <div id="adminList" class="admin-list"></div>
+      </div>
+      <div id="adminMusic" style="display:none">
+        <div class="admin-controls">
+          <button class="glow-btn small-btn" onclick="showAddSongForm()">+ Add Song</button>
+          <button class="glow-btn small-btn" onclick="seedPlaylist()">Reset to Defaults</button>
+        </div>
+        <div id="musicList" class="admin-list"></div>
+        <div id="addSongForm" class="admin-song-form" style="display:none">
+          <h3>Add / Edit Song</h3>
+          <input type="text" id="songTitle" placeholder="Song Title">
+          <input type="text" id="songIcon" placeholder="Emoji Icon (e.g. 🎵)">
+          <input type="text" id="songPath" placeholder="File Path (e.g. audio/song.mp3)">
+          <input type="hidden" id="songEditId" value="">
+          <div class="song-form-btns">
+            <button class="glow-btn small-btn" onclick="saveSong()">Save</button>
+            <button class="glow-btn small-btn delete-btn" onclick="cancelSongForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <div id="music-status">&#9835; Choose your gender to start music</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
