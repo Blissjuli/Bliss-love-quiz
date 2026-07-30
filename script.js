@@ -584,8 +584,13 @@ function showAdminTab(tab) {
   document.getElementById('tabMusic').className = 'admin-tab' + (tab === 'music' ? ' active' : '');
   var resp = document.getElementById('adminResponses');
   var music = document.getElementById('adminMusic');
-  scrollPositions.responses = document.getElementById('adminList').scrollTop;
-  scrollPositions.music = document.getElementById('musicList').scrollTop;
+  if (!tab || tab === scrollPositions.lastTab) return;
+  if (scrollPositions.lastTab === 'responses') {
+    scrollPositions.responses = document.getElementById('adminList').scrollTop;
+  } else if (scrollPositions.lastTab === 'music') {
+    scrollPositions.music = document.getElementById('musicList').scrollTop;
+  }
+  scrollPositions.lastTab = tab;
   if (tab === 'responses') {
     music.style.display = 'none';
     resp.style.display = 'block';

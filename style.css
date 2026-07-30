@@ -614,6 +614,9 @@ body {
   padding: 8px 20px !important;
   font-size: 0.85em !important;
 }
+.small-btn:hover {
+  transform: none !important;
+}
 .admin-list {
   overflow-y: auto;
   padding-right: 5px;
@@ -714,6 +717,7 @@ body {
   box-shadow: none !important;
 }
 .delete-btn:hover {
+  transform: none !important;
   box-shadow: 0 0 20px rgba(255, 77, 77, 0.3) !important;
 }
 .admin-tabs {
@@ -733,6 +737,7 @@ body {
   color: #a070a0;
   cursor: pointer;
   transition: all 0.3s;
+  transform: none !important;
 }
 .admin-tab:hover {
   color: #ffd0e8;
