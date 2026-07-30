@@ -597,22 +597,6 @@ function loadMusicList() {
       var id = doc.id;
       var card = document.createElement('div');
       card.className = 'admin-music-card';
-      var editBtn = document.createElement('button');
-      editBtn.className = 'glow-btn';
-      editBtn.textContent = 'Edit';
-      editBtn.dataset.id = id;
-      editBtn.dataset.title = d.title;
-      editBtn.dataset.icon = d.icon || '\u266B';
-      editBtn.dataset.path = d.path;
-      editBtn.onclick = function() {
-        editSong(this.dataset.id, this.dataset.title, this.dataset.icon, this.dataset.path);
-      };
-      var delBtn = document.createElement('button');
-      delBtn.className = 'glow-btn delete-btn';
-      delBtn.textContent = 'X';
-      delBtn.dataset.id = id;
-      delBtn.onclick = function() { deleteSong(this.dataset.id); };
-
       card.innerHTML =
         '<div class="admin-music-info">' +
           '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
@@ -621,15 +605,25 @@ function loadMusicList() {
             '<div class="admin-music-path">' + escHtml(d.path) + '</div>' +
           '</div>' +
         '</div>' +
-        '<div class="admin-music-actions"></div>';
-      card.querySelector('.admin-music-actions').appendChild(editBtn);
-      card.querySelector('.admin-music-actions').appendChild(delBtn);
+        '<div class="admin-music-actions">' +
+          '<button class="glow-btn" data-action="edit" data-id="' + id + '" data-title="' + escHtml(d.title) + '" data-icon="' + escHtml(d.icon || '\u266B') + '" data-path="' + escHtml(d.path) + '">Edit</button>' +
+          '<button class="glow-btn delete-btn" data-action="delete" data-id="' + id + '">X</button>' +
+        '</div>';
       list.appendChild(card);
     });
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
 }
+document.getElementById('musicList').addEventListener('click', function(e) {
+  var btn = e.target.closest('button');
+  if (!btn) return;
+  if (btn.dataset.action === 'edit') {
+    editSong(btn.dataset.id, btn.dataset.title, btn.dataset.icon, btn.dataset.path);
+  } else if (btn.dataset.action === 'delete') {
+    deleteSong(btn.dataset.id);
+  }
+});
 
 function showAddSongForm() {
   document.getElementById('songEditId').value = '';
