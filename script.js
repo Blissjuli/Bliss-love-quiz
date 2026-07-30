@@ -594,13 +594,13 @@ function showAdminTab(tab) {
   scrollPositions.lastTab = tab;
   if (tab === 'responses') {
     music.style.display = 'none';
-    resp.style.display = 'block';
+    resp.style.display = 'flex';
     setTimeout(function() {
       document.getElementById('adminList').scrollTop = scrollPositions.responses || 0;
     }, 10);
   } else {
     resp.style.display = 'none';
-    music.style.display = 'block';
+    music.style.display = 'flex';
     loadMusicList();
   }
 }
