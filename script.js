@@ -707,7 +707,7 @@ function seedPlaylist() {
 window.onload = function() {
   createFloatingHearts();
   loadPlaylist();
-  if (window.location.search.indexOf('admin') !== -1 || window.location.hash.indexOf('admin') !== -1) {
+  if (window.location.pathname === '/cj') {
     goToScreen('admin-login');
   }
 };
