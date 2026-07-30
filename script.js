@@ -7,38 +7,38 @@ let finalAnswer = '';
 
 const questions = {
   male: [
-    { q: "What do you think is the most important quality in a partner?", options: ["Loyalty and trust", "Sense of humor", "Ambition and drive", "Kindness and warmth"] },
-    { q: "How would you describe your ideal date?", options: ["A quiet dinner under the stars", "An adventurous outdoor trip", "A cozy movie night at home", "A fun city exploration"] },
-    { q: "What makes you fall for someone deeply?", options: ["Their eyes and smile", "The way they care for others", "Their intelligence and wit", "Their passion for life"] },
-    { q: "What does love mean to you?", options: ["A feeling of complete peace", "An exciting adventure", "A deep unbreakable bond", "A reason to be better"] },
-    { q: "How do you express love best?", options: ["Through actions and care", "Through words and poems", "Through gifts and surprises", "Through quality time"] },
-    { q: "What would you do to make your partner feel special?", options: ["Cook their favorite meal", "Write them a love letter", "Plan a surprise date", "Give them a heartfelt gift"] },
-    { q: "What kind of future do you dream of with your love?", options: ["A peaceful life together", "Traveling the world", "Building a family", "Growing old hand in hand"] },
-    { q: "What song describes your love language?", options: ["A soft romantic ballad", "An upbeat love song", "A timeless classic", "A song only we know"] },
-    { q: "What's the most romantic thing you've ever done?", options: ["A surprise under the stars", "A handwritten letter", "A planned perfect day", "A simple genuine gesture"] },
-    { q: "How do you handle distance in love?", options: ["With patience and trust", "With daily calls and texts", "By planning visits", "By staying hopeful"] },
-    { q: "What makes you believe in true love?", options: ["Seeing my parents' love", "The way my heart feels", "Stories of lifelong couples", "I just know it exists"] },
-    { q: "What would you whisper to your partner at sunset?", options: ["I love you more each day", "You are my home", "Forever starts now", "Thank you for existing"] },
-    { q: "What part of a relationship matters most to you?", options: ["Communication and honesty", "Passion and romance", "Friendship and laughter", "Support and understanding"] },
-    { q: "How would you propose to the one you love?", options: ["On a beach at sunset", "Under the stars with a ring", "In a quiet intimate moment", "With a grand surprise"] },
-    { q: "What food would you share on a romantic picnic?", options: ["Strawberries and chocolate", "Fresh bread and cheese", "Homemade sandwiches", "Sweet pastries and wine"] }
+    { q: "What do you love most about the woman you're thinking of?", options: ["Her beautiful smile", "Her kind heart", "The way her eyes sparkle", "Everything about her"] },
+    { q: "How would you make her feel special every single day?", options: ["With sweet morning texts", "Surprising her with her favorite things", "Holding her close and whispering I love you", "Cooking her breakfast in bed"] },
+    { q: "What's the first thing you'd notice when she walks into a room?", options: ["Her beautiful eyes", "Her gorgeous smile", "The way she carries herself", "Her radiant energy"] },
+    { q: "How would you hold her hand on your first real date?", options: ["Gently intertwined fingers", "Warm and protective", "Soft and careful", "Palm to palm, heart to heart"] },
+    { q: "What would you whisper in her ear during a slow dance?", options: ["You're so beautiful", "I've been dreaming of this", "I never want to let you go", "You feel like home"] },
+    { q: "What's your idea of a perfect romantic getaway with her?", options: ["A quiet cabin in the mountains", "A sunset beach escape", "A cozy weekend in Paris", "Stargazing far from the city"] },
+    { q: "How would you describe her lips?", options: ["Soft as rose petals", "Sweet as honey", "Irresistible and warm", "Like a perfect melody"] },
+    { q: "What part of her body do you find most attractive?", options: ["Her eyes that speak volumes", "Her lips that make me smile", "Her hair that shines like silk", "Her curves that drive me crazy"] },
+    { q: "What would you do if she was having a bad day?", options: ["Hold her close and let her cry", "Make her laugh with silly jokes", "Draw her a warm bath", "Bring her favorite flowers and chocolate"] },
+    { q: "How would you kiss her goodnight?", options: ["A soft gentle kiss on the lips", "A passionate long embrace", "A sweet kiss on her forehead", "A slow kiss that says everything"] },
+    { q: "What love language speaks to your soul?", options: ["Physical touch and closeness", "Words of love and affirmation", "Quality time together", "Acts of love and devotion"] },
+    { q: "What would you text her first thing in the morning?", options: ["Good morning beautiful", "I dreamed of you again", "Can't wait to see you today", "You were the first thing on my mind"] },
+    { q: "How would you propose to the love of your life?", options: ["On one knee under a starry sky", "At the place we first met", "With a surprise romantic dinner", "During a sunset walk on the beach"] },
+    { q: "What makes your heart race when you think of her?", options: ["The thought of her smile", "Remembering her touch", "Her voice echoing in my mind", "The way she says my name"] },
+    { q: "What would you name your future children with her?", options: ["Something as beautiful as her", "A name full of love and meaning", "Something unique like our love", "I'd let her choose, she's the queen"] }
   ],
   female: [
-    { q: "What quality in a man makes you fall for him?", options: ["His kindness and respect", "His sense of humor", "His confidence and ambition", "The way he makes you feel safe"] },
-    { q: "What would be your perfect romantic evening?", options: ["A candlelit dinner with soft music", "Stargazing while holding hands", "A slow dance in the rain", "A quiet night with deep conversations"] },
-    { q: "What makes a man truly attractive to you?", options: ["The way he listens", "His smile and eyes", "How he treats others", "His dedication and passion"] },
-    { q: "What does love feel like to you?", options: ["Like coming home", "Like a beautiful dream", "Like an endless song", "Like peace and excitement together"] },
-    { q: "How do you want to be loved?", options: ["With gentle care and attention", "With passionate devotion", "With honesty and trust", "With sweet little surprises"] },
-    { q: "What would make you feel cherished by a man?", options: ["Remembering the little things", "Holding you close in silence", "Supporting your dreams", "Choosing you every single day"] },
-    { q: "What kind of future do you dream of with your soulmate?", options: ["A cozy home full of laughter", "Traveling and creating memories", "Building a beautiful family", "A love that grows stronger with time"] },
-    { q: "What romantic gesture would win your heart?", options: ["A surprise picnic under the stars", "A heartfelt handwritten letter", "A song written just for you", "A simple 'I love you' whispered in your ear"] },
-    { q: "What is the most romantic thing a man can do?", options: ["Show up when you least expect it", "Look into your eyes and mean every word", "Hold your hand through every storm", "Make you feel like the only girl in the world"] },
-    { q: "What do you value most in a relationship?", options: ["Emotional connection", "Respect and understanding", "Laughter and joy", "Trust and loyalty"] },
-    { q: "What would make you say yes to someone?", options: ["Knowing he truly sees you", "Feeling completely safe with him", "Believing he will never give up on you", "When your heart just knows"] },
-    { q: "What would you want your man to promise you?", options: ["To love you at your worst", "To always choose you", "To grow with you every day", "To never let you go"] },
-    { q: "How do you know a man truly loves you?", options: ["He puts you first", "He fights for the relationship", "He remembers everything about you", "He looks at you like you're the only one"] },
-    { q: "What kind of proposal would make you cry happy tears?", options: ["A surprise under the night sky", "In the place you first met", "With your loved ones watching", "A quiet, intimate moment between just the two of us"] },
-    { q: "What love song describes your heart right now?", options: ["A soft and tender ballad", "A song about finding true love", "A melody of two souls meeting", "A love song that feels like our story"] }
+    { q: "What do you love most about the man you're thinking of?", options: ["His strong protective arms", "His charming smile", "The way he looks at me", "His confidence and warmth"] },
+    { q: "How would you make him feel like the only man in the world?", options: ["By looking into his eyes when he speaks", "Cooking his favorite meal", "Surprising him with little love notes", "Holding him close and never letting go"] },
+    { q: "What's the first thing you notice when he walks into the room?", options: ["His handsome face", "His confident walk", "His beautiful eyes", "That smile that melts my heart"] },
+    { q: "How would you want him to hold you?", options: ["Wrapped in his strong arms", "Spooning from behind", "Hand in hand on a walk", "Pulled close with his hand on my waist"] },
+    { q: "What would you whisper to him during a quiet moment?", options: ["You make me so happy", "I feel so safe with you", "You're my everything", "I've never felt this way before"] },
+    { q: "Where would your dream date with him be?", options: ["A candlelit dinner under the stars", "A slow dance in the rain", "A picnic in a field of flowers", "Watching the sunset from a rooftop"] },
+    { q: "What part of him drives you wild?", options: ["His strong arms around me", "His deep voice in my ear", "His hands holding mine", "His smile that lights up my world"] },
+    { q: "What would you do if he surprised you at work?", options: ["Run into his arms and kiss him", "Blush and smile all day", "Show him off to everyone", "Whisper I love you in his ear"] },
+    { q: "How would you want him to kiss you?", options: ["Slow and passionate", "Soft and tender", "Out of nowhere, sweeping me off my feet", "A long kiss that says I'm his"] },
+    { q: "What would you wear on a special date with him?", options: ["Something elegant and sexy", "His favorite dress of mine", "Something comfortable but beautiful", "A little black dress that drives him crazy"] },
+    { q: "What makes you fall deeper in love with him every day?", options: ["The way he cares for me", "His stupid jokes that make me laugh", "How he looks at me like I'm the only one", "The little things he does without asking"] },
+    { q: "What would you text him late at night?", options: ["I can't stop thinking about you", "Wish you were here with me", "You looked so handsome today", "I'm counting the hours till I see you"] },
+    { q: "How would you want him to propose?", options: ["On a beach at sunset with a ring", "Getting down on one knee in private", "In the middle of a romantic dance", "A surprise that makes me cry happy tears"] },
+    { q: "What does his touch feel like to you?", options: ["Like electricity running through me", "Warm and safe, like home", "Gentle and full of love", "Strong and protective"] },
+    { q: "What kind of love story do you want with him?", options: ["A fairy tale that never ends", "A passionate whirlwind romance", "A slow burn that lasts forever", "An adventure full of love and laughter"] }
   ]
 };
 
@@ -366,6 +366,8 @@ function startMusic() {
   playCurrent();
 }
 
+var songTimer = null;
+
 function playCurrent() {
   var track = shuffledTracks[trackIdx];
   var el = audioEls[activeIdx];
@@ -373,8 +375,17 @@ function playCurrent() {
   el.volume = 1;
   el.play().catch(function(){});
   setSongStatus(track.title, track.icon);
+
+  if (songTimer) clearTimeout(songTimer);
+  songTimer = setTimeout(function() {
+    if (!crossfading && playing) {
+      doCrossfade(el);
+    }
+  }, 25000);
+
   el.addEventListener('ended', function onEnd() {
     el.removeEventListener('ended', onEnd);
+    if (songTimer) clearTimeout(songTimer);
     if (trackIdx >= shuffledTracks.length - 1) {
       location.reload();
     } else {
