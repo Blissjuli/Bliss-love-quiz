@@ -8,37 +8,27 @@ let finalAnswer = '';
 const questions = {
   male: [
     { q: "What do you love most about the woman you're thinking of?", options: ["Her beautiful smile", "Her kind heart", "The way her eyes sparkle", "Everything about her"] },
-    { q: "How would you make her feel special every single day?", options: ["With sweet morning texts", "Surprising her with her favorite things", "Holding her close and whispering I love you", "Cooking her breakfast in bed"] },
-    { q: "What's the first thing you'd notice when she walks into a room?", options: ["Her beautiful eyes", "Her gorgeous smile", "The way she carries herself", "Her radiant energy"] },
-    { q: "How would you hold her hand on your first real date?", options: ["Gently intertwined fingers", "Warm and protective", "Soft and careful", "Palm to palm, heart to heart"] },
     { q: "What would you whisper in her ear during a slow dance?", options: ["You're so beautiful", "I've been dreaming of this", "I never want to let you go", "You feel like home"] },
-    { q: "What's your idea of a perfect romantic getaway with her?", options: ["A quiet cabin in the mountains", "A sunset beach escape", "A cozy weekend in Paris", "Stargazing far from the city"] },
-    { q: "How would you describe her lips?", options: ["Soft as rose petals", "Sweet as honey", "Irresistible and warm", "Like a perfect melody"] },
-    { q: "What part of her body do you find most attractive?", options: ["Her eyes that speak volumes", "Her lips that make me smile", "Her hair that shines like silk", "Her curves that drive me crazy"] },
+    { q: "How would you hold her hand on your first real date?", options: ["Gently intertwined fingers", "Warm and protective", "Soft and careful", "Palm to palm, heart to heart"] },
     { q: "What would you do if she was having a bad day?", options: ["Hold her close and let her cry", "Make her laugh with silly jokes", "Draw her a warm bath", "Bring her favorite flowers and chocolate"] },
+    { q: "What part of her do you find most attractive?", options: ["Her eyes that speak volumes", "Her lips that make me smile", "Her hair that shines like silk", "Her curves that drive me crazy"] },
     { q: "How would you kiss her goodnight?", options: ["A soft gentle kiss on the lips", "A passionate long embrace", "A sweet kiss on her forehead", "A slow kiss that says everything"] },
-    { q: "What love language speaks to your soul?", options: ["Physical touch and closeness", "Words of love and affirmation", "Quality time together", "Acts of love and devotion"] },
     { q: "What would you text her first thing in the morning?", options: ["Good morning beautiful", "I dreamed of you again", "Can't wait to see you today", "You were the first thing on my mind"] },
-    { q: "How would you propose to the love of your life?", options: ["On one knee under a starry sky", "At the place we first met", "With a surprise romantic dinner", "During a sunset walk on the beach"] },
+    { q: "What's your idea of a perfect romantic getaway with her?", options: ["A quiet cabin in the mountains", "A sunset beach escape", "A cozy weekend in Paris", "Stargazing far from the city"] },
     { q: "What makes your heart race when you think of her?", options: ["The thought of her smile", "Remembering her touch", "Her voice echoing in my mind", "The way she says my name"] },
-    { q: "What would you name your future children with her?", options: ["Something as beautiful as her", "A name full of love and meaning", "Something unique like our love", "I'd let her choose, she's the queen"] }
+    { q: "How would you propose to the love of your life?", options: ["On one knee under a starry sky", "At the place we first met", "With a surprise romantic dinner", "During a sunset walk on the beach"] }
   ],
   female: [
     { q: "What do you love most about the man you're thinking of?", options: ["His strong protective arms", "His charming smile", "The way he looks at me", "His confidence and warmth"] },
-    { q: "How would you make him feel like the only man in the world?", options: ["By looking into his eyes when he speaks", "Cooking his favorite meal", "Surprising him with little love notes", "Holding him close and never letting go"] },
-    { q: "What's the first thing you notice when he walks into the room?", options: ["His handsome face", "His confident walk", "His beautiful eyes", "That smile that melts my heart"] },
-    { q: "How would you want him to hold you?", options: ["Wrapped in his strong arms", "Spooning from behind", "Hand in hand on a walk", "Pulled close with his hand on my waist"] },
     { q: "What would you whisper to him during a quiet moment?", options: ["You make me so happy", "I feel so safe with you", "You're my everything", "I've never felt this way before"] },
-    { q: "Where would your dream date with him be?", options: ["A candlelit dinner under the stars", "A slow dance in the rain", "A picnic in a field of flowers", "Watching the sunset from a rooftop"] },
-    { q: "What part of him drives you wild?", options: ["His strong arms around me", "His deep voice in my ear", "His hands holding mine", "His smile that lights up my world"] },
+    { q: "How would you want him to hold you?", options: ["Wrapped in his strong arms", "Spooning from behind", "Hand in hand on a walk", "Pulled close with his hand on my waist"] },
     { q: "What would you do if he surprised you at work?", options: ["Run into his arms and kiss him", "Blush and smile all day", "Show him off to everyone", "Whisper I love you in his ear"] },
+    { q: "What part of him drives you wild?", options: ["His strong arms around me", "His deep voice in my ear", "His hands holding mine", "His smile that lights up my world"] },
     { q: "How would you want him to kiss you?", options: ["Slow and passionate", "Soft and tender", "Out of nowhere, sweeping me off my feet", "A long kiss that says I'm his"] },
-    { q: "What would you wear on a special date with him?", options: ["Something elegant and sexy", "His favorite dress of mine", "Something comfortable but beautiful", "A little black dress that drives him crazy"] },
-    { q: "What makes you fall deeper in love with him every day?", options: ["The way he cares for me", "His stupid jokes that make me laugh", "How he looks at me like I'm the only one", "The little things he does without asking"] },
     { q: "What would you text him late at night?", options: ["I can't stop thinking about you", "Wish you were here with me", "You looked so handsome today", "I'm counting the hours till I see you"] },
-    { q: "How would you want him to propose?", options: ["On a beach at sunset with a ring", "Getting down on one knee in private", "In the middle of a romantic dance", "A surprise that makes me cry happy tears"] },
+    { q: "Where would your dream date with him be?", options: ["A candlelit dinner under the stars", "A slow dance in the rain", "A picnic in a field of flowers", "Watching the sunset from a rooftop"] },
     { q: "What does his touch feel like to you?", options: ["Like electricity running through me", "Warm and safe, like home", "Gentle and full of love", "Strong and protective"] },
-    { q: "What kind of love story do you want with him?", options: ["A fairy tale that never ends", "A passionate whirlwind romance", "A slow burn that lasts forever", "An adventure full of love and laughter"] }
+    { q: "How would you want him to propose?", options: ["On a beach at sunset with a ring", "Getting down on one knee in private", "In the middle of a romantic dance", "A surprise that makes me cry happy tears"] }
   ]
 };
 
