@@ -459,6 +459,7 @@ function adminLogin() {
       var token = await result.user.getIdTokenResult();
       if (token.claims.admin) {
         adminLoggedIn = true;
+        scrollPositions.lastTab = 'responses';
         document.getElementById('adminLoginError').textContent = '';
         goToScreen('admin');
         refreshAdminData();
@@ -715,11 +716,12 @@ window.onload = function() {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         user.getIdTokenResult().then(function(token) {
-          if (token.claims.admin) {
-            adminLoggedIn = true;
-            goToScreen('admin');
-            refreshAdminData();
-          } else {
+      if (token.claims.admin) {
+        adminLoggedIn = true;
+        scrollPositions.lastTab = 'responses';
+        goToScreen('admin');
+        refreshAdminData();
+      } else {
             goToScreen('admin-login');
             firebase.auth().signOut();
           }
