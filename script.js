@@ -595,41 +595,33 @@ function loadMusicList() {
     snapshot.forEach(function(doc) {
       var d = doc.data();
       var id = doc.id;
-      var card = document.createElement('div');
-      card.className = 'admin-music-card';
-      card.innerHTML =
-        '<div class="admin-music-info">' +
-          '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
-          '<div>' +
-            '<div class="admin-music-title">' + escHtml(d.title) + '</div>' +
-            '<div class="admin-music-path">' + escHtml(d.path) + '</div>' +
+      list.innerHTML +=
+        '<div class="admin-music-card">' +
+          '<div class="admin-music-info">' +
+            '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
+            '<div>' +
+              '<div class="admin-music-title">' + escHtml(d.title) + '</div>' +
+              '<div class="admin-music-path">' + escHtml(d.path) + '</div>' +
+            '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="admin-music-actions">' +
-          '<button class="glow-btn edit-btn" data-id="' + id + '">Edit</button>' +
-          '<button class="glow-btn delete-btn" data-id="' + id + '">X</button>' +
+          '<div class="admin-music-actions">' +
+            '<button class="glow-btn" onclick="editSongFromFirestore(\'' + id.replace(/'/g, "\\'") + '\')">Edit</button>' +
+            '<button class="glow-btn delete-btn" onclick="deleteSong(\'' + id.replace(/'/g, "\\'") + '\')">X</button>' +
+          '</div>' +
         '</div>';
-      list.appendChild(card);
     });
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
 }
-document.getElementById('musicList').addEventListener('click', function(e) {
-  var btn = e.target.closest('button');
-  if (!btn) return;
-  var id = btn.dataset.id;
-  if (!id) return;
-  if (btn.classList.contains('edit-btn')) {
-    db.collection('playlist').doc(id).get().then(function(doc) {
-      if (!doc.exists) return;
-      var d = doc.data();
-      editSong(id, d.title, d.icon || '\u266B', d.path);
-    }).catch(console.error);
-  } else if (btn.classList.contains('delete-btn')) {
-    deleteSong(id);
-  }
-});
+
+function editSongFromFirestore(id) {
+  db.collection('playlist').doc(id).get().then(function(doc) {
+    if (!doc.exists) return;
+    var d = doc.data();
+    editSong(id, d.title, d.icon || '\u266B', d.path);
+  }).catch(console.error);
+}
 
 function showAddSongForm() {
   document.getElementById('songEditId').value = '';
