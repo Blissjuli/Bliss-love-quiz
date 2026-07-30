@@ -617,10 +617,12 @@ function loadMusicList() {
 
 function editSongFromFirestore(id) {
   db.collection('playlist').doc(id).get().then(function(doc) {
-    if (!doc.exists) return;
+    if (!doc.exists) { alert('Song not found in Firestore'); return; }
     var d = doc.data();
     editSong(id, d.title, d.icon || '\u266B', d.path);
-  }).catch(console.error);
+  }).catch(function(err) {
+    alert('Firestore error: ' + err.message);
+  });
 }
 
 function showAddSongForm() {
