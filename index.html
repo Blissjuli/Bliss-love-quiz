@@ -137,7 +137,18 @@
       </div>
       <div id="adminMusic" style="display:none">
         <div class="admin-controls">
+          <button class="glow-btn small-btn" onclick="showAddSongForm()">+ Add Song</button>
           <button class="glow-btn small-btn" onclick="seedPlaylist()">Reset to Defaults</button>
+        </div>
+        <div id="addSongForm" class="admin-song-form" style="display:none">
+          <h3>Add New Song</h3>
+          <input type="text" id="songTitle" placeholder="Song Title" autocomplete="off">
+          <input type="text" id="songIcon" placeholder="Emoji Icon (e.g. 🎶)" autocomplete="off">
+          <input type="text" id="songPath" placeholder="Audio Path (e.g. audio/song.mp3)" autocomplete="off">
+          <div class="song-form-btns">
+            <button class="glow-btn small-btn" onclick="addSong()">Save</button>
+            <button class="glow-btn small-btn" onclick="hideAddSongForm()">Cancel</button>
+          </div>
         </div>
         <div id="musicList" class="admin-list"></div>
       </div>

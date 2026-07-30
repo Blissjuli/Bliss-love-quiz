@@ -5,7 +5,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-const uid = 'UPIu6wFr0SbSdyicktY4JrfzjeU2';
+const uid = 'dHyGRciQzjaizPLP0miALf6wdeO2';
 
 async function makeAdmin() {
   try {

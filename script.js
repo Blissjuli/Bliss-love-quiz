@@ -583,6 +583,51 @@ function showAdminTab(tab) {
   if (tab === 'music') loadMusicList();
 }
 
+function showAddSongForm() {
+  document.getElementById('addSongForm').style.display = 'block';
+}
+
+function hideAddSongForm() {
+  document.getElementById('addSongForm').style.display = 'none';
+  document.getElementById('songTitle').value = '';
+  document.getElementById('songIcon').value = '';
+  document.getElementById('songPath').value = '';
+}
+
+function addSong() {
+  var title = document.getElementById('songTitle').value.trim();
+  var icon = document.getElementById('songIcon').value.trim() || '\u266B';
+  var path = document.getElementById('songPath').value.trim();
+
+  if (!title) { alert('Please enter a song title'); return; }
+  if (!path) { alert('Please enter the audio path'); return; }
+
+  db.collection('playlist').orderBy('order', 'desc').limit(1).get().then(function(snapshot) {
+    var nextOrder = 0;
+    snapshot.forEach(function(doc) { nextOrder = doc.data().order + 1; });
+
+    db.collection('playlist').add({
+      title: title,
+      icon: icon,
+      path: path,
+      order: nextOrder
+    }).then(function() {
+      hideAddSongForm();
+      loadMusicList();
+    }).catch(console.error);
+  }).catch(function() {
+    db.collection('playlist').add({
+      title: title,
+      icon: icon,
+      path: path,
+      order: 0
+    }).then(function() {
+      hideAddSongForm();
+      loadMusicList();
+    }).catch(console.error);
+  });
+}
+
 function loadMusicList() {
   var list = document.getElementById('musicList');
   list.innerHTML = '<div class="admin-loading">Loading...</div>';
