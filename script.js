@@ -596,7 +596,7 @@ function loadMusicList() {
       var d = doc.data();
       var id = doc.id;
       html +=
-        '<div class="admin-music-card">' +
+        '<div class="admin-music-card" data-id="' + id + '">' +
           '<div class="admin-music-info">' +
             '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
             '<div>' +
@@ -605,32 +605,34 @@ function loadMusicList() {
             '</div>' +
           '</div>' +
           '<div class="admin-music-actions">' +
-            '<button class="glow-btn" data-id="' + id + '">Edit</button>' +
-            '<button class="glow-btn delete-btn" data-id="' + id + '">X</button>' +
+            '<button class="glow-btn" onclick="editById(this)">Edit</button>' +
+            '<button class="glow-btn delete-btn" onclick="delById(this)">X</button>' +
           '</div>' +
         '</div>';
     });
     list.innerHTML = html;
-    Array.from(list.querySelectorAll('.admin-music-actions .glow-btn:not(.delete-btn)')).forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        var docId = this.getAttribute('data-id');
-        db.collection('playlist').doc(docId).get().then(function(snap) {
-          if (!snap.exists) return;
-          var data = snap.data();
-          editSong(docId, data.title, data.icon || '\u266B', data.path);
-        }).catch(function(err) {
-          alert('Error: ' + err.message);
-        });
-      });
-    });
-    Array.from(list.querySelectorAll('.admin-music-actions .delete-btn')).forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        deleteSong(this.getAttribute('data-id'));
-      });
-    });
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
+}
+
+function editById(btn) {
+  var card = btn.closest('.admin-music-card');
+  if (!card) return;
+  var id = card.getAttribute('data-id');
+  db.collection('playlist').doc(id).get().then(function(snap) {
+    if (!snap.exists) return;
+    var d = snap.data();
+    editSong(id, d.title, d.icon || '\u266B', d.path);
+  }).catch(function(err) {
+    alert(err.message);
+  });
+}
+
+function delById(btn) {
+  var card = btn.closest('.admin-music-card');
+  if (!card) return;
+  deleteSong(card.getAttribute('data-id'));
 }
 
 
