@@ -606,8 +606,8 @@ function loadMusicList() {
           '</div>' +
         '</div>' +
         '<div class="admin-music-actions">' +
-          '<button class="glow-btn" data-action="edit" data-id="' + id + '" data-title="' + escHtml(d.title) + '" data-icon="' + escHtml(d.icon || '\u266B') + '" data-path="' + escHtml(d.path) + '">Edit</button>' +
-          '<button class="glow-btn delete-btn" data-action="delete" data-id="' + id + '">X</button>' +
+          '<button class="glow-btn edit-btn" data-id="' + id + '">Edit</button>' +
+          '<button class="glow-btn delete-btn" data-id="' + id + '">X</button>' +
         '</div>';
       list.appendChild(card);
     });
@@ -618,10 +618,16 @@ function loadMusicList() {
 document.getElementById('musicList').addEventListener('click', function(e) {
   var btn = e.target.closest('button');
   if (!btn) return;
-  if (btn.dataset.action === 'edit') {
-    editSong(btn.dataset.id, btn.dataset.title, btn.dataset.icon, btn.dataset.path);
-  } else if (btn.dataset.action === 'delete') {
-    deleteSong(btn.dataset.id);
+  var id = btn.dataset.id;
+  if (!id) return;
+  if (btn.classList.contains('edit-btn')) {
+    db.collection('playlist').doc(id).get().then(function(doc) {
+      if (!doc.exists) return;
+      var d = doc.data();
+      editSong(id, d.title, d.icon || '\u266B', d.path);
+    }).catch(console.error);
+  } else if (btn.classList.contains('delete-btn')) {
+    deleteSong(id);
   }
 });
 
