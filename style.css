@@ -109,21 +109,28 @@ body {
   z-index: 2;
   position: relative;
 }
-.surprise-content {
-  max-height: 100vh;
+#screen-surprise {
+  align-items: flex-start;
+  padding-top: 20px;
   overflow-y: auto;
-  padding-bottom: 80px;
 }
-.surprise-content::-webkit-scrollbar {
+#screen-surprise::-webkit-scrollbar {
   width: 4px;
 }
-.surprise-content::-webkit-scrollbar-track {
+#screen-surprise::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 2px;
 }
-.surprise-content::-webkit-scrollbar-thumb {
+#screen-surprise::-webkit-scrollbar-thumb {
   background: rgba(255, 77, 122, 0.3);
   border-radius: 2px;
+}
+.surprise-content {
+  max-height: none;
+  overflow: visible;
+}
+#screen-surprise .surprise-content {
+  padding-bottom: 90px;
 }
 
 .heart-beat {
