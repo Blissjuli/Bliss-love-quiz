@@ -617,6 +617,7 @@ function loadMusicList() {
 
 
 function showAddSongForm() {
+  alert('showAddSongForm called');
   document.getElementById('songEditId').value = '';
   document.getElementById('songTitle').value = '';
   document.getElementById('songIcon').value = '\u266B';
@@ -629,11 +630,13 @@ function cancelSongForm() {
 }
 
 function saveSong() {
+  alert('saveSong called');
   var title = document.getElementById('songTitle').value.trim();
   var icon = document.getElementById('songIcon').value.trim() || '\u266B';
   var path = document.getElementById('songPath').value.trim();
   var editId = document.getElementById('songEditId').value;
-  if (!title || !path) return;
+  alert('title: ' + title + ' path: ' + path + ' editId: ' + editId);
+  if (!title || !path) { alert('missing title or path'); return; }
 
   if (editId) {
     db.collection('playlist').doc(editId).update({
