@@ -617,12 +617,26 @@ function loadMusicList() {
 
 
 function showAddSongForm() {
-  alert('showAddSongForm called');
-  document.getElementById('songEditId').value = '';
-  document.getElementById('songTitle').value = '';
-  document.getElementById('songIcon').value = '\u266B';
-  document.getElementById('songPath').value = 'audio/';
-  document.getElementById('addSongForm').style.display = 'block';
+  alert('1 - function started');
+  var el1 = document.getElementById('songEditId');
+  var el2 = document.getElementById('songTitle');
+  var el3 = document.getElementById('songIcon');
+  var el4 = document.getElementById('songPath');
+  var el5 = document.getElementById('addSongForm');
+  alert('2 - got all elements');
+  if (!el1) { alert('songEditId missing'); return; }
+  if (!el2) { alert('songTitle missing'); return; }
+  if (!el3) { alert('songIcon missing'); return; }
+  if (!el4) { alert('songPath missing'); return; }
+  if (!el5) { alert('addSongForm missing'); return; }
+  alert('3 - all exist, setting values');
+  el1.value = '';
+  el2.value = '';
+  el3.value = '\u266B';
+  el4.value = 'audio/';
+  alert('4 - setting display block');
+  el5.style.display = 'block';
+  alert('5 - done');
 }
 
 function cancelSongForm() {
