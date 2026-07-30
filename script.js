@@ -577,8 +577,12 @@ goToScreen = function(id) {
 function showAdminTab(tab) {
   document.getElementById('tabResponses').className = 'admin-tab' + (tab === 'responses' ? ' active' : '');
   document.getElementById('tabMusic').className = 'admin-tab' + (tab === 'music' ? ' active' : '');
-  document.getElementById('adminResponses').style.display = tab === 'responses' ? 'block' : 'none';
-  document.getElementById('adminMusic').style.display = tab === 'music' ? 'block' : 'none';
+  var resp = document.getElementById('adminResponses');
+  var music = document.getElementById('adminMusic');
+  resp.style.visibility = tab === 'responses' ? 'visible' : 'hidden';
+  resp.style.position = tab === 'responses' ? 'static' : 'absolute';
+  music.style.visibility = tab === 'music' ? 'visible' : 'hidden';
+  music.style.position = tab === 'music' ? 'static' : 'absolute';
   if (tab === 'music') loadMusicList();
 }
 
@@ -687,7 +691,24 @@ window.onload = function() {
   createFloatingHearts();
   loadPlaylist();
   if (window.location.pathname === '/cj') {
-    goToScreen('admin-login');
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        user.getIdTokenResult().then(function(token) {
+          if (token.claims.admin) {
+            adminLoggedIn = true;
+            goToScreen('admin');
+            refreshAdminData();
+          } else {
+            goToScreen('admin-login');
+            firebase.auth().signOut();
+          }
+        }).catch(function() {
+          goToScreen('admin-login');
+        });
+      } else {
+        goToScreen('admin-login');
+      }
+    });
   }
 };
 
