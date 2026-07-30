@@ -112,6 +112,7 @@ body {
 .surprise-content {
   max-height: 100vh;
   overflow-y: auto;
+  padding-bottom: 80px;
 }
 .surprise-content::-webkit-scrollbar {
   width: 4px;
