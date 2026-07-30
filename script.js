@@ -591,11 +591,11 @@ function loadMusicList() {
       list.innerHTML = '<div class="admin-empty">No songs. Add one or reset to defaults.</div>';
       return;
     }
-    list.innerHTML = '';
+    var html = '';
     snapshot.forEach(function(doc) {
       var d = doc.data();
       var id = doc.id;
-      list.innerHTML +=
+      html +=
         '<div class="admin-music-card">' +
           '<div class="admin-music-info">' +
             '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
@@ -605,25 +605,34 @@ function loadMusicList() {
             '</div>' +
           '</div>' +
           '<div class="admin-music-actions">' +
-            '<button class="glow-btn" onclick="editSongFromFirestore(\'' + id.replace(/'/g, "\\'") + '\')">Edit</button>' +
-            '<button class="glow-btn delete-btn" onclick="deleteSong(\'' + id.replace(/'/g, "\\'") + '\')">X</button>' +
+            '<button class="glow-btn" data-id="' + id + '">Edit</button>' +
+            '<button class="glow-btn delete-btn" data-id="' + id + '">X</button>' +
           '</div>' +
         '</div>';
     });
+    list.innerHTML = html;
+    var btns = list.querySelectorAll('.admin-music-actions .glow-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].onclick = function() {
+        var id = this.dataset.id;
+        if (this.classList.contains('delete-btn')) {
+          deleteSong(id);
+        } else {
+          db.collection('playlist').doc(id).get().then(function(doc) {
+            if (!doc.exists) return;
+            var d = doc.data();
+            editSong(id, d.title, d.icon || '\u266B', d.path);
+          }).catch(function(err) {
+            alert('Error: ' + err.message);
+          });
+        }
+      };
+    }
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
 }
 
-function editSongFromFirestore(id) {
-  db.collection('playlist').doc(id).get().then(function(doc) {
-    if (!doc.exists) { alert('Song not found in Firestore'); return; }
-    var d = doc.data();
-    editSong(id, d.title, d.icon || '\u266B', d.path);
-  }).catch(function(err) {
-    alert('Firestore error: ' + err.message);
-  });
-}
 
 function showAddSongForm() {
   document.getElementById('songEditId').value = '';
