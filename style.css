@@ -615,9 +615,17 @@ body {
   font-size: 0.85em !important;
 }
 .admin-list {
-  flex: 1;
   overflow-y: auto;
   padding-right: 5px;
+  flex: 1;
+  min-height: 0;
+}
+#adminResponses, #adminMusic {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 .admin-list::-webkit-scrollbar {
   width: 4px;
