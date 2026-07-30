@@ -596,7 +596,7 @@ function loadMusicList() {
       var d = doc.data();
       var id = doc.id;
       html +=
-        '<div class="admin-music-card" data-id="' + id + '">' +
+        '<div class="admin-music-card">' +
           '<div class="admin-music-info">' +
             '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
             '<div>' +
@@ -605,8 +605,7 @@ function loadMusicList() {
             '</div>' +
           '</div>' +
           '<div class="admin-music-actions">' +
-            '<button class="glow-btn" onclick="editById(this)">Edit</button>' +
-            '<button class="glow-btn delete-btn" onclick="delById(this)">X</button>' +
+            '<button class="glow-btn delete-btn" onclick="deleteSong(\'' + id.replace(/'/g, "\\'") + '\')">X</button>' +
           '</div>' +
         '</div>';
     });
@@ -614,25 +613,6 @@ function loadMusicList() {
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
-}
-
-function editById(btn) {
-  var card = btn.closest('.admin-music-card');
-  if (!card) return;
-  var id = card.getAttribute('data-id');
-  db.collection('playlist').doc(id).get().then(function(snap) {
-    if (!snap.exists) return;
-    var d = snap.data();
-    editSong(id, d.title, d.icon || '\u266B', d.path);
-  }).catch(function(err) {
-    alert(err.message);
-  });
-}
-
-function delById(btn) {
-  var card = btn.closest('.admin-music-card');
-  if (!card) return;
-  deleteSong(card.getAttribute('data-id'));
 }
 
 
