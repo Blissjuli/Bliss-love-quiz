@@ -533,6 +533,9 @@ function refreshAdminData() {
         card.appendChild(details);
         list.appendChild(card);
       });
+      setTimeout(function() {
+        list.scrollTop = scrollPositions.responses || 0;
+      }, 10);
     })
     .catch(function(err) {
       list.innerHTML = '<div class="admin-empty">Error loading data</div>';
@@ -574,16 +577,26 @@ goToScreen = function(id) {
 
 /* ---- Music Manager (Admin) ---- */
 
+var scrollPositions = {};
+
 function showAdminTab(tab) {
   document.getElementById('tabResponses').className = 'admin-tab' + (tab === 'responses' ? ' active' : '');
   document.getElementById('tabMusic').className = 'admin-tab' + (tab === 'music' ? ' active' : '');
   var resp = document.getElementById('adminResponses');
   var music = document.getElementById('adminMusic');
-  resp.style.visibility = tab === 'responses' ? 'visible' : 'hidden';
-  resp.style.position = tab === 'responses' ? 'static' : 'absolute';
-  music.style.visibility = tab === 'music' ? 'visible' : 'hidden';
-  music.style.position = tab === 'music' ? 'static' : 'absolute';
-  if (tab === 'music') loadMusicList();
+  scrollPositions.responses = document.getElementById('adminList').scrollTop;
+  scrollPositions.music = document.getElementById('musicList').scrollTop;
+  if (tab === 'responses') {
+    music.style.display = 'none';
+    resp.style.display = 'block';
+    setTimeout(function() {
+      document.getElementById('adminList').scrollTop = scrollPositions.responses || 0;
+    }, 10);
+  } else {
+    resp.style.display = 'none';
+    music.style.display = 'block';
+    loadMusicList();
+  }
 }
 
 function showAddSongForm() {
@@ -658,6 +671,9 @@ function loadMusicList() {
         '</div>';
     });
     list.innerHTML = html;
+    setTimeout(function() {
+      list.scrollTop = scrollPositions.music || 0;
+    }, 10);
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
