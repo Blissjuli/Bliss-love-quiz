@@ -651,13 +651,14 @@ function saveSong() {
   if (!title || !path) return;
 
   if (editId) {
-    db.collection('playlist').doc(editId).get().then(function(doc) {
-      var data = { title: title, icon: icon, path: path, order: doc.exists ? doc.data().order : 0 };
-      return db.collection('playlist').doc(editId).update(data);
+    db.collection('playlist').doc(editId).update({
+      title: title, icon: icon, path: path
     }).then(function() {
       cancelSongForm();
       loadMusicList();
-    }).catch(console.error);
+    }).catch(function(err) {
+      alert('Error saving: ' + err.message);
+    });
   } else {
     db.collection('playlist').orderBy('order', 'desc').limit(1).get().then(function(snap) {
       var maxOrder = 0;
