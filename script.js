@@ -617,26 +617,18 @@ function loadMusicList() {
 
 
 function showAddSongForm() {
-  alert('1 - function started');
   var el1 = document.getElementById('songEditId');
   var el2 = document.getElementById('songTitle');
   var el3 = document.getElementById('songIcon');
   var el4 = document.getElementById('songPath');
   var el5 = document.getElementById('addSongForm');
-  alert('2 - got all elements');
-  if (!el1) { alert('songEditId missing'); return; }
-  if (!el2) { alert('songTitle missing'); return; }
-  if (!el3) { alert('songIcon missing'); return; }
-  if (!el4) { alert('songPath missing'); return; }
-  if (!el5) { alert('addSongForm missing'); return; }
-  alert('3 - all exist, setting values');
+  if (!el1 || !el2 || !el3 || !el4 || !el5) return;
   el1.value = '';
   el2.value = '';
   el3.value = '\u266B';
   el4.value = 'audio/';
-  alert('4 - setting display block');
   el5.style.display = 'block';
-  alert('5 - done');
+  el5.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function cancelSongForm() {
@@ -644,13 +636,11 @@ function cancelSongForm() {
 }
 
 function saveSong() {
-  alert('saveSong called');
   var title = document.getElementById('songTitle').value.trim();
   var icon = document.getElementById('songIcon').value.trim() || '\u266B';
   var path = document.getElementById('songPath').value.trim();
   var editId = document.getElementById('songEditId').value;
-  alert('title: ' + title + ' path: ' + path + ' editId: ' + editId);
-  if (!title || !path) { alert('missing title or path'); return; }
+  if (!title || !path) return;
 
   if (editId) {
     db.collection('playlist').doc(editId).update({
