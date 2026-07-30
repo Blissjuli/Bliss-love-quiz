@@ -611,23 +611,23 @@ function loadMusicList() {
         '</div>';
     });
     list.innerHTML = html;
-    var btns = list.querySelectorAll('.admin-music-actions .glow-btn');
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].onclick = function() {
-        var id = this.dataset.id;
-        if (this.classList.contains('delete-btn')) {
-          deleteSong(id);
-        } else {
-          db.collection('playlist').doc(id).get().then(function(doc) {
-            if (!doc.exists) return;
-            var d = doc.data();
-            editSong(id, d.title, d.icon || '\u266B', d.path);
-          }).catch(function(err) {
-            alert('Error: ' + err.message);
-          });
-        }
-      };
-    }
+    Array.from(list.querySelectorAll('.admin-music-actions .glow-btn:not(.delete-btn)')).forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        var docId = this.getAttribute('data-id');
+        db.collection('playlist').doc(docId).get().then(function(snap) {
+          if (!snap.exists) return;
+          var data = snap.data();
+          editSong(docId, data.title, data.icon || '\u266B', data.path);
+        }).catch(function(err) {
+          alert('Error: ' + err.message);
+        });
+      });
+    });
+    Array.from(list.querySelectorAll('.admin-music-actions .delete-btn')).forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        deleteSong(this.getAttribute('data-id'));
+      });
+    });
   }).catch(function() {
     list.innerHTML = '<div class="admin-empty">Error loading music</div>';
   });
