@@ -616,66 +616,6 @@ function loadMusicList() {
 }
 
 
-function showAddSongForm() {
-  var el1 = document.getElementById('songEditId');
-  var el2 = document.getElementById('songTitle');
-  var el3 = document.getElementById('songIcon');
-  var el4 = document.getElementById('songPath');
-  var el5 = document.getElementById('addSongForm');
-  if (!el1 || !el2 || !el3 || !el4 || !el5) return;
-  el1.value = '';
-  el2.value = '';
-  el3.value = '\u266B';
-  el4.value = 'audio/';
-  el5.style.display = 'block';
-  el5.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function cancelSongForm() {
-  document.getElementById('addSongForm').style.display = 'none';
-}
-
-function saveSong() {
-  var title = document.getElementById('songTitle').value.trim();
-  var icon = document.getElementById('songIcon').value.trim() || '\u266B';
-  var path = document.getElementById('songPath').value.trim();
-  var editId = document.getElementById('songEditId').value;
-  if (!title || !path) return;
-
-  if (editId) {
-    db.collection('playlist').doc(editId).update({
-      title: title, icon: icon, path: path
-    }).then(function() {
-      cancelSongForm();
-      loadMusicList();
-    }).catch(function(err) {
-      alert('Error saving: ' + err.message);
-    });
-  } else {
-    db.collection('playlist').orderBy('order', 'desc').limit(1).get().then(function(snap) {
-      var maxOrder = 0;
-      snap.forEach(function(d) { maxOrder = d.data().order + 1; });
-      return db.collection('playlist').add({ title: title, icon: icon, path: path, order: maxOrder });
-    }).then(function() {
-      cancelSongForm();
-      loadMusicList();
-    }).catch(function() {
-      db.collection('playlist').add({ title: title, icon: icon, path: path, order: 0 }).then(function() {
-        cancelSongForm();
-        loadMusicList();
-      }).catch(console.error);
-    });
-  }
-}
-
-function editSong(id, title, icon, path) {
-  document.getElementById('songEditId').value = id;
-  document.getElementById('songTitle').value = title;
-  document.getElementById('songIcon').value = icon;
-  document.getElementById('songPath').value = path;
-  document.getElementById('addSongForm').style.display = 'block';
-}
-
 function deleteSong(id) {
   if (!confirm('Delete this song?')) return;
   db.collection('playlist').doc(id).delete().then(function() {
