@@ -75,6 +75,8 @@ function goToScreen(id) {
     currentScreen = id;
     reapplyAnimations(el);
   }
+  document.getElementById('music-status').style.display =
+    (id === 'admin' || id === 'admin-login') ? 'none' : '';
 }
 
 function reapplyAnimations(el) {
