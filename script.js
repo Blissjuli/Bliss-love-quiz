@@ -326,6 +326,8 @@ var trackIdx = 0;
 var shuffledTracks = [];
 var crossfading = false;
 var playing = false;
+var FADE_DURATION = 4000;
+var SONG_INTERVAL = 28000;
 
 function shuffle(arr) {
   for (var i = arr.length - 1; i > 0; i--) {
@@ -367,7 +369,7 @@ function playCurrent() {
     if (!crossfading && playing) {
       doCrossfade(el);
     }
-  }, 25000);
+  }, SONG_INTERVAL - FADE_DURATION);
 
   el.addEventListener('ended', function onEnd() {
     el.removeEventListener('ended', onEnd);
@@ -393,7 +395,7 @@ function watchForFade(el) {
   var handler = function() {
     if (!el.duration || crossfading) return;
     var remain = el.duration - el.currentTime;
-    if (remain <= 2.5 && remain > 0) {
+    if (remain <= FADE_DURATION / 1000 && remain > 0) {
       el.removeEventListener('timeupdate', handler);
       doCrossfade(el);
     }
@@ -413,7 +415,7 @@ function doCrossfade(oldEl) {
   setSongStatus(track.title, track.icon);
 
   var start = Date.now();
-  var dur = 2000;
+  var dur = FADE_DURATION;
 
   function ramp() {
     var p = Math.min((Date.now() - start) / dur, 1);
