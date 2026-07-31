@@ -681,6 +681,24 @@ body {
   transition: transform 0.3s;
   flex-shrink: 0;
 }
+.admin-final {
+  font-size: 0.7em;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.final-yes {
+  background: rgba(255, 77, 122, 0.15);
+  color: #ff6b9d;
+  border: 1px solid rgba(255, 77, 122, 0.3);
+}
+.final-no {
+  background: rgba(255, 77, 77, 0.1);
+  color: #ff8888;
+  border: 1px solid rgba(255, 77, 77, 0.3);
+}
 .admin-card.open .admin-card-toggle {
   transform: rotate(180deg);
 }

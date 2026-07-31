@@ -520,6 +520,7 @@ function refreshAdminData() {
         }
         var genderEmoji = d.gender === 'male' ? '\u2642' : '\u2640';
         var finalEmoji = d.final_answer === 'yes' ? '\u2764' : '\uD83D\uDC94';
+        var finalLabel = d.final_answer === 'yes' ? 'SAID YES' : 'SAID NO';
         var qs = questions[d.gender] || [];
 
         var card = document.createElement('div');
@@ -529,10 +530,10 @@ function refreshAdminData() {
         header.onclick = function() { this.parentNode.classList.toggle('open'); };
         header.innerHTML =
           '<div>' +
-            '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + ' ' + finalEmoji + '</span></div>' +
+            '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + '</span></div>' +
             '<div class="admin-card-meta"><span>' + dateStr + '</span><span>' + id.slice(0,8) + '</span></div>' +
           '</div>' +
-          '<span class="admin-card-toggle">\u25BC</span>';
+          '<span class="admin-final ' + (d.final_answer === 'yes' ? 'final-yes' : 'final-no') + '">' + finalLabel + ' ' + finalEmoji + '</span>';
         var details = document.createElement('div');
         details.className = 'admin-card-details';
         details.innerHTML = d.answers.map(function(ans, i) {
