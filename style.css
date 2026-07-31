@@ -623,7 +623,7 @@ body {
   flex: 1;
   min-height: 0;
 }
-#adminResponses, #adminMusic {
+#adminResponses, #adminMusic, #adminQuestions {
   display: flex;
   flex-direction: column;
   flex: 1;
