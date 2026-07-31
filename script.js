@@ -4,8 +4,9 @@ let userName = '';
 let quizIndex = 0;
 let userAnswers = [];
 let finalAnswer = '';
+let editingGender = 'male';
 
-const questions = {
+var defaultQuestions = {
   male: [
     { q: "What do you love most about the woman you're thinking of?", options: ["Her beautiful smile", "Her kind heart", "The way her eyes sparkle", "Everything about her"] },
     { q: "What would you whisper in her ear during a slow dance?", options: ["You're so beautiful", "I've been dreaming of this", "I never want to let you go", "You feel like home"] },
@@ -27,6 +28,22 @@ const questions = {
     { q: "How would you want him to propose?", options: ["On a beach at sunset with a ring", "Getting down on one knee in private", "In the middle of a romantic dance", "A surprise that makes me cry happy tears"] }
   ]
 };
+var questions = defaultQuestions;
+
+function loadQuestions(callback) {
+  db.collection('quiz_questions').doc('male').get().then(function(maleDoc) {
+    return db.collection('quiz_questions').doc('female').get().then(function(femaleDoc) {
+      var qs = {};
+      qs.male = maleDoc.exists ? maleDoc.data().questions : defaultQuestions.male;
+      qs.female = femaleDoc.exists ? femaleDoc.data().questions : defaultQuestions.female;
+      questions = qs;
+      if (callback) callback();
+    });
+  }).catch(function() {
+    questions = defaultQuestions;
+    if (callback) callback();
+  });
+}
 
 const happyPoems = [
   `You came like dawn, so soft and bright,\nChasing away the lonely night.\nMy heart once locked, you found the key,\nForever yours, and you for me.\n\nWith every breath, with every beat,\nMy love for you is so complete.\nA love like ours, so rare and true,\nI'll spend my life loving you.`,
@@ -583,25 +600,33 @@ var scrollPositions = {};
 function showAdminTab(tab) {
   document.getElementById('tabResponses').className = 'admin-tab' + (tab === 'responses' ? ' active' : '');
   document.getElementById('tabMusic').className = 'admin-tab' + (tab === 'music' ? ' active' : '');
+  document.getElementById('tabQuestions').className = 'admin-tab' + (tab === 'questions' ? ' active' : '');
   var resp = document.getElementById('adminResponses');
   var music = document.getElementById('adminMusic');
+  var qsTab = document.getElementById('adminQuestions');
   if (!tab || tab === scrollPositions.lastTab) return;
   if (scrollPositions.lastTab === 'responses') {
     scrollPositions.responses = document.getElementById('adminList').scrollTop;
   } else if (scrollPositions.lastTab === 'music') {
     scrollPositions.music = document.getElementById('musicList').scrollTop;
+  } else if (scrollPositions.lastTab === 'questions') {
+    scrollPositions.questions = document.getElementById('questionsList').scrollTop;
   }
   scrollPositions.lastTab = tab;
+  resp.style.display = tab === 'responses' ? 'flex' : 'none';
+  music.style.display = tab === 'music' ? 'flex' : 'none';
+  qsTab.style.display = tab === 'questions' ? 'flex' : 'none';
   if (tab === 'responses') {
-    music.style.display = 'none';
-    resp.style.display = 'flex';
     setTimeout(function() {
       document.getElementById('adminList').scrollTop = scrollPositions.responses || 0;
     }, 10);
-  } else {
-    resp.style.display = 'none';
-    music.style.display = 'flex';
+  } else if (tab === 'music') {
     loadMusicList();
+  } else if (tab === 'questions') {
+    renderQuestionEditor();
+    setTimeout(function() {
+      document.getElementById('questionsList').scrollTop = scrollPositions.questions || 0;
+    }, 10);
   }
 }
 
@@ -708,10 +733,85 @@ function seedPlaylist() {
   }).catch(console.error);
 }
 
+/* ---- Question Editor (Admin) ---- */
+
+function toggleQuestionGender() {
+  editingGender = editingGender === 'male' ? 'female' : 'male';
+  document.getElementById('questionGenderBtn').textContent = 'Editing: ' + (editingGender === 'male' ? 'Male' : 'Female');
+  renderQuestionEditor();
+}
+
+function renderQuestionEditor() {
+  var list = document.getElementById('questionsList');
+  list.innerHTML = '';
+  var qs = questions[editingGender];
+  if (!qs || qs.length === 0) {
+    list.innerHTML = '<div class="admin-empty">No questions yet</div>';
+    return;
+  }
+  qs.forEach(function(item, i) {
+    var card = document.createElement('div');
+    card.className = 'admin-card question-card';
+    card.innerHTML =
+      '<div class="question-card-top">' +
+        '<strong>Question ' + (i + 1) + '</strong>' +
+        '<button class="glow-btn delete-btn" onclick="removeQuestion(' + i + ')">Remove</button>' +
+      '</div>' +
+      '<input type="text" class="q-input q-text" data-i="' + i + '" value="' + escHtml(item.q) + '" placeholder="Question text">' +
+      item.options.map(function(opt, oi) {
+        return '<div class="q-option-row"><span class="q-option-label">' + (oi + 1) + '</span><input type="text" class="q-input q-option" data-i="' + i + '" data-oi="' + oi + '" value="' + escHtml(opt) + '" placeholder="Option ' + (oi + 1) + '"></div>';
+      }).join('') +
+      '<button class="glow-btn small-btn q-add-option" onclick="addOption(' + i + ')">+ Add Option</button>';
+    list.appendChild(card);
+  });
+  var addBtn = document.createElement('button');
+  addBtn.className = 'glow-btn small-btn';
+  addBtn.textContent = '+ Add Question';
+  addBtn.style.marginTop = '10px';
+  addBtn.onclick = addQuestion;
+  list.appendChild(addBtn);
+}
+
+function removeQuestion(i) {
+  if (!confirm('Remove this question?')) return;
+  questions[editingGender].splice(i, 1);
+  renderQuestionEditor();
+}
+
+function addQuestion() {
+  questions[editingGender].push({ q: '', options: ['', '', '', ''] });
+  renderQuestionEditor();
+}
+
+function addOption(i) {
+  questions[editingGender][i].options.push('');
+  renderQuestionEditor();
+}
+
+function saveQuestions() {
+  var inputs = document.querySelectorAll('#questionsList .q-input');
+  inputs.forEach(function(input) {
+    var i = parseInt(input.dataset.i);
+    if (input.classList.contains('q-text')) {
+      questions[editingGender][i].q = input.value;
+    } else {
+      questions[editingGender][i].options[parseInt(input.dataset.oi)] = input.value;
+    }
+  });
+  var doc = db.collection('quiz_questions').doc(editingGender);
+  doc.set({ questions: questions[editingGender] }).then(function() {
+    alert('Questions saved for ' + (editingGender === 'male' ? 'Male' : 'Female'));
+  }).catch(function(err) {
+    alert('Error saving: ' + err.message);
+    console.error(err);
+  });
+}
+
 /* ---- Init ---- */
 window.onload = function() {
   createFloatingHearts();
   loadPlaylist();
+  loadQuestions();
   if (window.location.pathname === '/cj') {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {

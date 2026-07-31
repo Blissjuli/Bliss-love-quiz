@@ -127,6 +127,7 @@
       <div class="admin-tabs">
         <button class="admin-tab active" id="tabResponses" onclick="showAdminTab('responses')">Responses</button>
         <button class="admin-tab" id="tabMusic" onclick="showAdminTab('music')">Music</button>
+        <button class="admin-tab" id="tabQuestions" onclick="showAdminTab('questions')">Questions</button>
       </div>
       <div id="adminResponses">
         <div class="admin-controls">
@@ -151,6 +152,13 @@
           </div>
         </div>
         <div id="musicList" class="admin-list"></div>
+      </div>
+      <div id="adminQuestions" style="display:none">
+        <div class="admin-controls">
+          <button class="glow-btn small-btn" onclick="toggleQuestionGender()" id="questionGenderBtn">Editing: Male</button>
+          <button class="glow-btn small-btn" onclick="saveQuestions()">Save Questions</button>
+        </div>
+        <div id="questionsList" class="admin-list"></div>
       </div>
     </div>
   </div>
