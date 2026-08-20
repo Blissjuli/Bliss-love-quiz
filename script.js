@@ -808,6 +808,43 @@ function saveQuestions() {
   });
 }
 
+/* ---- Pull to refresh ---- */
+(function() {
+  if (!('ontouchstart' in window)) return;
+  var ptr = document.getElementById('pull-refresh');
+  var startY = 0, pulling = false, pullDist = 0;
+  var THRESHOLD = 80;
+  window.addEventListener('touchstart', function(e) {
+    if (currentScreen !== 'welcome' && currentScreen !== 'gender') return;
+    if (window.scrollY > 0) return;
+    startY = e.touches[0].clientY;
+    pulling = true;
+    pullDist = 0;
+  }, { passive: true });
+  window.addEventListener('touchmove', function(e) {
+    if (!pulling) return;
+    var dy = e.touches[0].clientY - startY;
+    if (dy < 0) { pulling = false; ptr.classList.remove('pulling'); return; }
+    pullDist = Math.min(dy * 0.5, 120);
+    if (pullDist > 0) {
+      ptr.classList.add('pulling');
+      ptr.style.transform = 'translateY(' + (pullDist - 100) + 'px)';
+    }
+  }, { passive: true });
+  window.addEventListener('touchend', function() {
+    if (!pulling) return;
+    pulling = false;
+    if (pullDist >= THRESHOLD) {
+      ptr.classList.add('loading');
+      ptr.style.transform = 'translateY(0)';
+      setTimeout(function() { location.reload(); }, 300);
+    } else {
+      ptr.classList.remove('pulling');
+      ptr.style.transform = '';
+    }
+  }, { passive: true });
+})();
+
 /* ---- Init ---- */
 window.onload = function() {
   createFloatingHearts();
