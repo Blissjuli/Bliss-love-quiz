@@ -554,10 +554,18 @@ body {
   transform: rotateY(180deg);
   background: linear-gradient(135deg, rgba(255, 77, 122, 0.34), rgba(196, 77, 255, 0.34));
   border: 1px solid rgba(255, 120, 160, 0.45);
-  padding: 10px;
-  font-size: 0.75em;
+  padding: 8px;
+  font-size: clamp(11px, 1.6vmin, 15px);
+  font-family: 'Georgia', serif;
   color: #ffd0e8;
-  line-height: 1.4;
+  line-height: 1.25;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .surprise-box.opened {
   cursor: default;
