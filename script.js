@@ -608,44 +608,58 @@ function refreshAdminData() {
       snapshot.forEach(function(doc) {
         var d = doc.data();
         var id = doc.id;
-        var dateStr = '';
-        if (d.createdAt) {
-          var date = d.createdAt.toDate();
-          dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        }
-        var genderEmoji = d.gender === 'male' ? '\u2642' : '\u2640';
-        var finalEmoji = d.final_answer === 'yes' ? '\u2764' : '\uD83D\uDC94';
-        var finalLabel = d.final_answer === 'yes' ? 'SAID YES' : 'SAID NO';
-        var qs = questions[d.gender] || [];
 
-        var card = document.createElement('div');
-        card.className = 'admin-card';
-        var header = document.createElement('div');
-        header.className = 'admin-card-header';
-        header.onclick = function() { this.parentNode.classList.toggle('open'); };
-        header.innerHTML =
-          '<div>' +
-            '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + '</span></div>' +
-            '<div class="admin-card-meta"><span>' + dateStr + '</span><span>' + id.slice(0,8) + '</span></div>' +
-          '</div>' +
-          '<span class="admin-final ' + (d.final_answer === 'yes' ? 'final-yes' : 'final-no') + '">' + finalLabel + ' ' + finalEmoji + '</span>';
-        var details = document.createElement('div');
-        details.className = 'admin-card-details';
-        details.innerHTML = d.answers.map(function(ans, i) {
-          var qText = qs[i] ? qs[i].q : 'Q' + (i+1);
-          return '<div class="admin-qa"><strong>' + escHtml(qText) + '</strong><br>A: ' + escHtml(ans) + '</div>';
-        }).join('');
-        var actions = document.createElement('div');
-        actions.className = 'admin-card-actions';
-        var delBtn = document.createElement('button');
-        delBtn.className = 'glow-btn delete-btn';
-        delBtn.textContent = 'Delete';
-        delBtn.onclick = function(e) { e.stopPropagation(); deleteResponse(id); };
-        actions.appendChild(delBtn);
-        details.appendChild(actions);
-        card.appendChild(header);
-        card.appendChild(details);
-        list.appendChild(card);
+        try {
+          var dateStr = '';
+          var ts = d.createdAt;
+          if (ts && typeof ts.toDate === 'function') {
+            var date = ts.toDate();
+            dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          }
+
+          var genderEmoji = d.gender === 'male' ? '\u2642' : (d.gender === 'female' ? '\u2640' : '\u2753');
+          var isYes = d.final_answer === 'yes';
+          var finalEmoji = isYes ? '\u2764' : '\uD83D\uDC94';
+          var finalLabel = isYes ? 'SAID YES' : 'SAID NO';
+          var qs = (questions && questions[d.gender]) ? questions[d.gender] : null;
+          var answersList = Array.isArray(d.answers) ? d.answers : [];
+
+          var card = document.createElement('div');
+          card.className = 'admin-card';
+          var header = document.createElement('div');
+          header.className = 'admin-card-header';
+          header.onclick = function() { this.parentNode.classList.toggle('open'); };
+          header.innerHTML =
+            '<div>' +
+              '<div class="admin-card-name">' + escHtml(d.name || 'Anonymous') + ' <span style="color:#a070a0;font-size:0.85em">' + genderEmoji + '</span></div>' +
+              '<div class="admin-card-meta"><span>' + escHtml(dateStr) + '</span><span>' + escHtml(id.slice(0,8)) + '</span></div>' +
+            '</div>' +
+            '<span class="admin-final ' + (isYes ? 'final-yes' : 'final-no') + '">' + finalLabel + ' ' + finalEmoji + '</span>';
+          var details = document.createElement('div');
+          details.className = 'admin-card-details';
+          if (answersList.length === 0) {
+            details.innerHTML = '<div class="admin-qa">No answers recorded</div>';
+          } else {
+            details.innerHTML = answersList.map(function(ans, i) {
+              var qText = (qs && qs[i] && qs[i].q) ? qs[i].q : ('Q' + (i+1));
+              var safeAns = (typeof ans === 'string') ? ans : String(ans || '');
+              return '<div class="admin-qa"><strong>' + escHtml(qText) + '</strong><br>A: ' + escHtml(safeAns) + '</div>';
+            }).join('');
+          }
+          var actions = document.createElement('div');
+          actions.className = 'admin-card-actions';
+          var delBtn = document.createElement('button');
+          delBtn.className = 'glow-btn delete-btn';
+          delBtn.textContent = 'Delete';
+          delBtn.onclick = function(e) { e.stopPropagation(); deleteResponse(id); };
+          actions.appendChild(delBtn);
+          details.appendChild(actions);
+          card.appendChild(header);
+          card.appendChild(details);
+          list.appendChild(card);
+        } catch (e) {
+          console.error('Error rendering response', id, e);
+        }
       });
       setTimeout(function() {
         list.scrollTop = scrollPositions.responses || 0;
@@ -667,9 +681,12 @@ function deleteResponse(id) {
 }
 
 function escHtml(str) {
-  var div = document.createElement('div');
-  div.appendChild(document.createTextNode(str));
-  return div.innerHTML;
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /* ---- Override goToScreen ---- */
@@ -848,15 +865,19 @@ function renderQuestionEditor() {
   qs.forEach(function(item, i) {
     var card = document.createElement('div');
     card.className = 'admin-card question-card';
+    var qText = (item && typeof item.q === 'string') ? item.q : '';
+    var options = (item && Array.isArray(item.options)) ? item.options : [];
+    var optionsHtml = options.map(function(opt, oi) {
+      var safeOpt = (typeof opt === 'string') ? opt : String(opt || '');
+      return '<div class="q-option-row"><span class="q-option-label">' + (oi + 1) + '</span><input type="text" class="q-input q-option" data-i="' + i + '" data-oi="' + oi + '" value="' + escHtml(safeOpt) + '" placeholder="Option ' + (oi + 1) + '"></div>';
+    }).join('');
     card.innerHTML =
       '<div class="question-card-top">' +
         '<strong>Question ' + (i + 1) + '</strong>' +
         '<button class="glow-btn delete-btn" onclick="removeQuestion(' + i + ')">Remove</button>' +
       '</div>' +
-      '<input type="text" class="q-input q-text" data-i="' + i + '" value="' + escHtml(item.q) + '" placeholder="Question text">' +
-      item.options.map(function(opt, oi) {
-        return '<div class="q-option-row"><span class="q-option-label">' + (oi + 1) + '</span><input type="text" class="q-input q-option" data-i="' + i + '" data-oi="' + oi + '" value="' + escHtml(opt) + '" placeholder="Option ' + (oi + 1) + '"></div>';
-      }).join('') +
+      '<input type="text" class="q-input q-text" data-i="' + i + '" value="' + escHtml(qText) + '" placeholder="Question text">' +
+      optionsHtml +
       '<button class="glow-btn small-btn q-add-option" onclick="addOption(' + i + ')">+ Add Option</button>';
     list.appendChild(card);
   });
