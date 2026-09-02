@@ -123,7 +123,7 @@ function showQuestion() {
   }
 
   const q = qs[quizIndex];
-  document.getElementById('quizQuestion').textContent = q.q;
+  typeQuestion(q.q);
   document.getElementById('questionNum').textContent = `${quizIndex + 1}/${qs.length}`;
   document.getElementById('progressFill').style.width = `${((quizIndex) / qs.length) * 100}%`;
 
@@ -143,6 +143,27 @@ function selectAnswer(answer) {
   userAnswers.push(answer);
   quizIndex++;
   setTimeout(showQuestion, 300);
+}
+
+/* ---- Typewriter ---- */
+var questionTypeTimer = null;
+function typeQuestion(text) {
+  var el = document.getElementById('quizQuestion');
+  if (questionTypeTimer) { clearTimeout(questionTypeTimer); questionTypeTimer = null; }
+  el.textContent = '';
+  el.classList.add('typing');
+  var i = 0;
+  function step() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i);
+      i++;
+      questionTypeTimer = setTimeout(step, 16);
+    } else {
+      el.textContent = text;
+      el.classList.remove('typing');
+    }
+  }
+  step();
 }
 
 function answerFinal(yes) {
@@ -201,7 +222,7 @@ function generateSurpriseBoxes() {
   msgs.forEach((msg, i) => {
     const box = document.createElement('div');
     box.className = 'surprise-box';
-    box.innerHTML = `<span class="box-front">${['&#127873;', '&#10084;', '&#127800;', '&#11088;', '&#127775;', '&#127801;', '&#128153;', '&#127799;', '&#128158;', '&#128149;', '&#127826;', '&#127838;'][i]}</span><span class="box-back">${msg}</span>`;
+    box.innerHTML = `<div class="flip-inner"><span class="box-front">${['&#127873;', '&#10084;', '&#127800;', '&#11088;', '&#127775;', '&#127801;', '&#128153;', '&#127799;', '&#128158;', '&#128149;', '&#127826;', '&#127838;'][i]}</span><span class="box-back">${msg}</span></div>`;
     box.onclick = () => {
       if (!box.classList.contains('opened')) {
         box.classList.add('opened');
@@ -297,6 +318,74 @@ function createFloatingHearts() {
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 10000);
   }, 400);
+}
+
+/* ---- Starfield (parallax) ---- */
+function createStarfield() {
+  const container = document.getElementById('particles');
+  if (!container) return;
+  const count = window.innerWidth < 600 ? 60 : 120;
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    const size = (Math.random() * 2.5 + 1).toFixed(1);
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top = (Math.random() * 100) + '%';
+    s.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    s.style.animationDelay = (Math.random() * 4) + 's';
+    if (Math.random() > 0.7) s.classList.add('star-pink');
+    container.appendChild(s);
+  }
+}
+
+var parallaxTarget = { x: 0, y: 0 };
+var parallaxCurrent = { x: 0, y: 0 };
+var parallaxFrame = false;
+function initParallax() {
+  window.addEventListener('pointermove', function(e) {
+    parallaxTarget.x = (e.clientX / window.innerWidth - 0.5);
+    parallaxTarget.y = (e.clientY / window.innerHeight - 0.5);
+    if (!parallaxFrame) {
+      parallaxFrame = true;
+      (function loop() {
+        parallaxCurrent.x += (parallaxTarget.x - parallaxCurrent.x) * 0.05;
+        parallaxCurrent.y += (parallaxTarget.y - parallaxCurrent.y) * 0.05;
+        const el = document.getElementById('particles');
+        if (el) el.style.transform = 'translate(' + (parallaxCurrent.x * 30) + 'px,' + (parallaxCurrent.y * 30) + 'px)';
+        if (Math.abs(parallaxTarget.x - parallaxCurrent.x) > 0.001 || Math.abs(parallaxTarget.y - parallaxCurrent.y) > 0.001) {
+          requestAnimationFrame(loop);
+        } else {
+          parallaxFrame = false;
+        }
+      })();
+    }
+  }, { passive: true });
+}
+
+/* ---- Heart trail following cursor ---- */
+var lastTrailSpawn = 0;
+function initHeartTrail() {
+  const glyphs = ['\u2665', '\u2764', '\u2661'];
+  const colors = ['#ff4d7a', '#ff9ecf', '#ff6b9d', '#c44dff'];
+  window.addEventListener('pointermove', function(e) {
+    const now = Date.now();
+    if (now - lastTrailSpawn < 55) return;
+    lastTrailSpawn = now;
+    const h = document.createElement('div');
+    h.className = 'trail-heart';
+    h.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    h.style.left = e.clientX + 'px';
+    h.style.top = e.clientY + 'px';
+    h.style.color = colors[Math.floor(Math.random() * colors.length)];
+    h.style.fontSize = (Math.random() * 10 + 10) + 'px';
+    document.body.appendChild(h);
+    setTimeout(function() {
+      if (h.parentNode) h.parentNode.removeChild(h);
+    }, 1000);
+  }, { passive: true });
 }
 
 
@@ -847,6 +936,9 @@ function saveQuestions() {
 
 /* ---- Init ---- */
 window.onload = function() {
+  createStarfield();
+  initParallax();
+  initHeartTrail();
   createFloatingHearts();
   loadPlaylist();
   loadQuestions();
