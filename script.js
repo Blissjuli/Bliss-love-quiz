@@ -182,6 +182,12 @@ function answerFinal(yes) {
 }
 
 function submitQuizData() {
+  const hp = document.getElementById('hpField');
+  if (hp && hp.value && hp.value.trim() !== '') {
+    console.warn('Honeypot triggered - submission dropped.');
+    return;
+  }
+
   const qs = questions[userGender];
   const qaList = userAnswers.map((answer, i) =>
     `Q${i+1}: ${qs[i].q}\nA: ${answer}`

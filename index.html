@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body><title>Love Story</title>
 
@@ -50,6 +50,7 @@
       <p class="fade-in">I'd love to know who I'm talking to...</p>
       <div class="name-input-wrap">
         <input type="text" id="nameInput" placeholder="Enter your name..." maxlength="30" autocomplete="off">
+        <input type="text" id="hpField" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;opacity:0;border:none;padding:0;margin:0">
         <button class="glow-btn" onclick="submitName()">Continue</button>
       </div>
     </div>
@@ -172,6 +173,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-check-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   const firebaseConfig = {
@@ -184,8 +186,18 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+
+  // App Check: paste your reCAPTCHA v3 site key below AFTER enabling in
+  // Firebase Console -> App Check. Until then keep it empty so the site
+  // keeps working (App Check not yet enforced in console).
+  // WARNING: only flip the console "Enforce" toggle AFTER this key is set.
+  const APP_CHECK_RECAPTCHA_SITE_KEY = "";
+  if (APP_CHECK_RECAPTCHA_SITE_KEY && window.firebase && window.firebase.appCheck) {
+    firebase.appCheck().activate(APP_CHECK_RECAPTCHA_SITE_KEY);
+  }
+
   emailjs.init('2sUH4UOUREwyjv7xp');
 </script>
-<script src="script.js?v=4"></script>
+<script src="script.js?v=5"></script>
 </body>
 </html>
