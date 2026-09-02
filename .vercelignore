@@ -1,0 +1,6 @@
+serviceAccountKey.json
+setAdmin.js
+firestore.rules
+firebase.json
+.git
+node_modules

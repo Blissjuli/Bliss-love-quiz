@@ -1,4 +1,6 @@
 serviceAccountKey.json
+setAdmin.js
 node_modules
-
 .vercel
+firebase-debug.log
+.firebase/
