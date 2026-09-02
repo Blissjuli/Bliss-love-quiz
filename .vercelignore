@@ -1,5 +1,6 @@
 serviceAccountKey.json
 setAdmin.js
+changeAdminPassword.js
 firestore.rules
 firebase.json
 .git

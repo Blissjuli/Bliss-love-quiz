@@ -1,5 +1,6 @@
 serviceAccountKey.json
 setAdmin.js
+changeAdminPassword.js
 node_modules
 .vercel
 firebase-debug.log
