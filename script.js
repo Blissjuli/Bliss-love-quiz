@@ -188,6 +188,25 @@ function submitQuizData() {
     return `Q${i+1}: ${qText}\nA: ${answer}`;
   }).join('\n\n');
 
+  const problems = [];
+  if (typeof userName !== 'string' || userName.trim().length < 1) problems.push('name empty');
+  if (typeof userName !== 'string' || userName.length > 30) problems.push('name >30 chars (' + userName.length + ')');
+  if (userGender !== 'male' && userGender !== 'female') problems.push('gender invalid (' + JSON.stringify(userGender) + ')');
+  const ansArr = Array.isArray(userAnswers) ? userAnswers : [];
+  if (ansArr.length < 1) problems.push('answers empty');
+  if (ansArr.length > 12) problems.push('answers >12 (' + ansArr.length + ')');
+  if (ansArr.some(function(a) { return typeof a !== 'string' || a.length < 1 || a.length > 500; })) problems.push('an answer is not a valid string (1-500 chars)');
+  if (finalAnswer !== 'yes' && finalAnswer !== 'no') problems.push('final_answer invalid (' + JSON.stringify(finalAnswer) + ')');
+  if (problems.length) {
+    console.error('CLIENT-SIDE RULE CHECK FAILED:', problems, { userName: userName, userGender: userGender, userAnswers: userAnswers, finalAnswer: finalAnswer });
+    var fb = document.getElementById('saveError');
+    if (fb) {
+      fb.textContent = '⚠ Validation failed before saving: ' + problems.join('; ');
+      fb.style.display = 'block';
+    }
+    return;
+  }
+
   db.collection('quiz_responses').add({
     name: userName,
     gender: userGender,
