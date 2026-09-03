@@ -826,7 +826,7 @@ function loadMusicList() {
       var d = doc.data();
       var id = doc.id;
       html +=
-        '<div class="admin-music-card">' +
+        '<div class="admin-music-card" data-id="' + escHtml(id) + '">' +
           '<div class="admin-music-info">' +
             '<span class="admin-music-icon">' + (d.icon || '\u266B') + '</span>' +
             '<div>' +
@@ -835,11 +835,16 @@ function loadMusicList() {
             '</div>' +
           '</div>' +
           '<div class="admin-music-actions">' +
-            '<button class="glow-btn delete-btn" onclick="deleteSong(\'' + id.replace(/'/g, "\\'") + '\')">X</button>' +
+            '<button class="glow-btn delete-btn" type="button">X</button>' +
           '</div>' +
         '</div>';
     });
     list.innerHTML = html;
+    Array.from(list.querySelectorAll('.admin-music-card')).forEach(function(card) {
+      var id = card.getAttribute('data-id');
+      var btn = card.querySelector('.delete-btn');
+      if (btn) btn.onclick = function() { deleteSong(id); };
+    });
     setTimeout(function() {
       list.scrollTop = scrollPositions.music || 0;
     }, 10);
@@ -934,10 +939,14 @@ function saveQuestions() {
   var inputs = document.querySelectorAll('#questionsList .q-input');
   inputs.forEach(function(input) {
     var i = parseInt(input.dataset.i);
+    if (!questions[editingGender] || !questions[editingGender][i]) return;
     if (input.classList.contains('q-text')) {
       questions[editingGender][i].q = input.value;
     } else {
-      questions[editingGender][i].options[parseInt(input.dataset.oi)] = input.value;
+      var oi = parseInt(input.dataset.oi);
+      if (questions[editingGender][i].options && oi < questions[editingGender][i].options.length) {
+        questions[editingGender][i].options[oi] = input.value;
+      }
     }
   });
   var doc = db.collection('quiz_questions').doc(editingGender);
