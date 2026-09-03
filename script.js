@@ -666,7 +666,9 @@ function refreshAdminData() {
       }, 10);
     })
     .catch(function(err) {
-      list.innerHTML = '<div class="admin-empty">Error loading data</div>';
+      var msg = (err && err.message) ? err.message : String(err);
+      if (err && err.code) msg = err.code + ': ' + msg;
+      list.innerHTML = '<div class="admin-empty">Error loading data</div><div class="admin-empty" style="font-size:0.85em;color:#ff8888;padding:0 0 10px">' + escHtml(msg) + '</div>';
       console.error(err);
     });
 }
