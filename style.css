@@ -490,6 +490,18 @@ body {
   white-space: pre-line;
 }
 
+.save-error {
+  font-size: 0.85em;
+  color: #ff8a8a;
+  background: rgba(255, 60, 60, 0.12);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 14px auto;
+  max-width: 460px;
+  word-break: break-word;
+}
+
 .hearts-rain {
   font-size: 40px;
   animation: heartsRain 2s ease-in-out infinite;

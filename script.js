@@ -206,7 +206,16 @@ function submitQuizData() {
       final_answer: finalAnswer,
       answers: qaList
     }).catch(console.error);
-  }).catch(console.error);
+  }).catch(function(err) {
+    console.error(err);
+    var fb = document.getElementById('saveError');
+    if (fb) {
+      var msg = (err && err.message) ? err.message : String(err);
+      if (err && err.code) msg = err.code + ': ' + msg;
+      fb.textContent = '⚠ Could not save your response: ' + msg;
+      fb.style.display = 'block';
+    }
+  });
 }
 
 function restartApp() {
