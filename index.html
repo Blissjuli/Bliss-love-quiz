@@ -173,7 +173,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-check-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   const firebaseConfig = {
@@ -187,14 +186,8 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // App Check: reCAPTCHA Enterprise site key (activated).
-  const APP_CHECK_RECAPTCHA_SITE_KEY = "6LcniKUtAAAAAJqZSG52b7P9vjpgyHQmRmKz0Nn2";
-  if (APP_CHECK_RECAPTCHA_SITE_KEY && window.firebase && window.firebase.appCheck) {
-    firebase.appCheck().activate(APP_CHECK_RECAPTCHA_SITE_KEY);
-  }
-
   emailjs.init('2sUH4UOUREwyjv7xp');
 </script>
-<script src="script.js?v=7"></script>
+<script src="script.js?v=8"></script>
 </body>
 </html>
