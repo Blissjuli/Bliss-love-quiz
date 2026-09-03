@@ -183,9 +183,10 @@ function answerFinal(yes) {
 
 function submitQuizData() {
   const qs = questions[userGender];
-  const qaList = userAnswers.map((answer, i) =>
-    `Q${i+1}: ${qs[i].q}\nA: ${answer}`
-  ).join('\n\n');
+  const qaList = (Array.isArray(userAnswers) ? userAnswers : []).map((answer, i) => {
+    const qText = (qs && qs[i] && qs[i].q) ? qs[i].q : ('Q' + (i + 1));
+    return `Q${i+1}: ${qText}\nA: ${answer}`;
+  }).join('\n\n');
 
   db.collection('quiz_responses').add({
     name: userName,
